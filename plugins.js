@@ -8,12 +8,10 @@ function findPlugins() {
 		if(require(`./plugins/${plugin}/plugin.json`)) {
 			const pluginConf = require(`./plugins/${plugin}/plugin.json`)
 			if(!pluginConf.name || !pluginConf.version || !pluginConf.entry) {return}
-			console.log(`found ${pluginConf.name} ${pluginConf.version}`)
+			console.log(`Found ${pluginConf.name} ${pluginConf.version}`)
 			plugins.push(require(`./plugins/${plugin}/${pluginConf.entry}`))
 		}
 	})
-	
-	console.log(plugins)
 	
 	return plugins;
 }
