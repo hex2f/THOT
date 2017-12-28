@@ -20,5 +20,8 @@
   "bugs": {
     "url": "https://github.com/RekkyRek/THOT/issues"
   },
-  "homepage": "https://github.com/RekkyRek/THOT#readme"
+  "homepage": "https://github.com/RekkyRek/THOT#readme",
+  "devDependencies": {
+    "discord.js": "^11.2.1"
+  }
 }
