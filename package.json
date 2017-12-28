@@ -1,0 +1,24 @@
+{
+  "name": "thotbot",
+  "version": "1.0.0",
+  "description": "THOT, The hottest bot in town.",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/RekkyRek/THOT.git"
+  },
+  "keywords": [
+    "Discord",
+    "Bot",
+    "THOT"
+  ],
+  "author": "RekkyRek",
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/RekkyRek/THOT/issues"
+  },
+  "homepage": "https://github.com/RekkyRek/THOT#readme"
+}
