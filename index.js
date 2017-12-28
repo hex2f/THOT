@@ -1,13 +1,22 @@
+const fs = require('fs');
+
 const config = require('./config.json');
+let plugins = [];
+
+fs.readdirSync('./plugins').forEach((plugin)=>{
+	console.log('Searching for plugins...');
+	if(plugin.split('.').pop() == 'js') {
+		const tempplug = require(`./plugins/${plugin}`);
+		if(!tempplug.name || !require(`./plugins/${plugin}`).version) {return;}
+		console.log(`found ${tempplug.name} ${tempplug.version} in ${plugin}`)
+		plugins.push(require(`./plugins/${plugin}`));
+	}
+})
 
 const EventEmitter = require('events');
 
 class THOTBot extends EventEmitter {}
 const thot = new THOTBot();
-
-const plugins = [
-	require('./plugins/test.js'),
-];
 
 thot.on('command', (msg) => {
 	msg.reply('hello world')
@@ -39,5 +48,3 @@ client.on('message', msg => {
 });
 
 client.login(config.token);
-
-console.log(config)
