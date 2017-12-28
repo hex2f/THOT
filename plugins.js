@@ -1,32 +1,30 @@
 const fs = require('fs')
 
-function findPlugins() {
+function findPlugins(cb = function(){}) {
 	let plugins = []
-	
-	console.log('Searching for plugins...')
 	
 	fs.readdirSync('./plugins').forEach((plugin)=>{
 		if(require(`./plugins/${plugin}/plugin.json`)) {
 			const pluginConf = require(`./plugins/${plugin}/plugin.json`)
 			if(!pluginConf.name || !pluginConf.version || !pluginConf.entry) {return}
-			console.log(`Found ${pluginConf.name} ${pluginConf.version}`)
 			const tempPlugin = require(`./plugins/${plugin}/${pluginConf.entry}`);
 			tempPlugin.name = pluginConf.name;
 			tempPlugin.version = pluginConf.version;
 			plugins.push(tempPlugin)
+			cb(pluginConf)
 		}
 	})
 	
 	return plugins;
 }
 
-function initPlugins(plugins, thot) {
+function initPlugins(plugins, thot, cb = function(){}) {
   plugins.forEach((plugin) => {
   	if(plugin.init) {
-  		console.log(`Successfully loaded ${plugin.name} ${plugin.version}.`)
   		plugin.init(thot)
+  		cb(false, plugin)
   	} else {
-  		console.warn(`${plugin.name} has no init() Skipping.`)
+  		cb(true, plugin)
   	}
   })
 }

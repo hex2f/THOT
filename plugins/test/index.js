@@ -27,7 +27,5 @@ function init(thot) {
 }
 
 module.exports = {
-	name: 'Test',
-	version: 'v1.0',
 	init: init,
 };
