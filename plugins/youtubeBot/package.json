@@ -1,0 +1,19 @@
+{
+  "name": "youtubebot",
+  "version": "1.0.0",
+  "description": "THOTBot youtube music plugin",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "keywords": [
+    "Discord",
+    "THOTBot"
+  ],
+  "author": "RekkyRek",
+  "license": "MIT",
+  "dependencies": {
+    "opusscript": "0.0.6",
+    "ytdl-core": "^0.18.5"
+  }
+}

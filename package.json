@@ -23,5 +23,8 @@
   "homepage": "https://github.com/RekkyRek/THOT#readme",
   "devDependencies": {
     "discord.js": "^11.2.1"
+  },
+  "dependencies": {
+    "opusscript": "0.0.6"
   }
 }
