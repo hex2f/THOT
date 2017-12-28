@@ -1,17 +1,5 @@
-const fs = require('fs')
-
 const config = require('./config.json')
-let plugins = []
-
-fs.readdirSync('./plugins').forEach((plugin)=>{
-	console.log('Searching for plugins...')
-	if(plugin.split('.').pop() == 'js') {
-		const tempplug = require(`./plugins/${plugin}`)
-		if(!tempplug.name || !require(`./plugins/${plugin}`).version) {return}
-		console.log(`found ${tempplug.name} ${tempplug.version} in ${plugin}`)
-		plugins.push(require(`./plugins/${plugin}`))
-	}
-})
+let plugins = require('./plugins.js').find()
 
 const EventEmitter = require('events')
 
@@ -28,17 +16,7 @@ const client = new Discord.Client()
 client.on('ready', () => {
   console.log(`Connected to Discord as ${client.user.tag}.`)
   console.log(`Initializing plugins...`)
-  
-  plugins.forEach((plugin) => {
-  	if(!plugin.name || !plugin.version) {return}
-  	
-  	if(plugin.init) {
-  		plugin.init(thot)
-  		console.log(`Successfully loaded ${plugin.name} ${plugin.version}`)
-  	} else {
-  		console.warn(`${plugin.name} has no init() Skipping.`)
-  	}
-  })
+  require('./plugins.js').init(plugins, thot)
 })
 
 client.on('message', msg => {
