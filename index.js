@@ -26,9 +26,11 @@ const Discord = require("discord.js")
 const client = new Discord.Client()
 
 client.on('ready', () => {
+  console.log(`Connected to Discord as ${client.user.tag}.`)
   console.log(`Initializing plugins...`)
+  
   plugins.forEach((plugin) => {
-  	if(!plugin.name || !plugin.version) return
+  	if(!plugin.name || !plugin.version) {return}
   	
   	if(plugin.init) {
   		plugin.init(thot)
