@@ -16,11 +16,11 @@ const thot = new THOTBot()
 const Discord = require("discord.js")
 const client = new Discord.Client()
 
-client.on('ready', () => {Successfully
+client.on('ready', () => {
   connectingSpinner.succeed(`Connected to Discord as ${client.user.tag}.`)
   
   const initSpinner = ora('Initializing plugins...').start();
-  require('./plugins.js').init(plugins, thot, (erSuccessfullyr, pl) => {
+  require('./plugins.js').init(plugins, thot, (err, pl) => {
   	if(err) { initSpinner.stopAndPersist({ symbol: '⚠', text: `${pl.name} does not export an init function. Skipping.` }); return; }
   	initSpinner.stopAndPersist({ symbol: '✔', text: `Successfully loaded ${pl.name} ${pl.version}` });
   });

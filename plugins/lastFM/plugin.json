@@ -1,0 +1,5 @@
+{
+	"name": "LastFM",
+	"version": "v1.0",
+	"entry": "index.js"
+}
