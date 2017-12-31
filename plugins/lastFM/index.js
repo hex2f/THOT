@@ -16,18 +16,14 @@ function fmset(msg) {
 }
 
 function currentPlaying(msg) {
-    if(msg.content)
     try {
         var user = db.getData(`/${msg.author.id}`);
         request(`http://ws.audioscrobbler.com/2.0/?method=user.getrecenttracks&user=${user}&api_key=8a3f54b3b37c3a5e0adda40da34af4fb&format=json`, (err, res, body) => {
             if(err) {throw err; return;}
             let data = JSON.parse(body).recenttracks;
-            let str = `**Current**: ${data.track[0].artist['#text']} - ${data.track[0].name}
-**Previous**: ${data.track[1].artist['#text']} - ${data.track[1].name}`;
-
+            let str = `**Current**: ${data.track[0].artist['#text']} - ${data.track[0].name}\n**Previous**: ${data.track[1].artist['#text']} - ${data.track[1].name}`;
             msg.channel.send(str);
         });
-
     } catch(error) {
         msg.channel.send('You need to set your lastfm username using !fmset <Username>');
     }
