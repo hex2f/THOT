@@ -22,8 +22,8 @@ function sub(msg) {
 
 function init(thot) {
 	THOT = thot;
-	THOT.on('add', add);
-	THOT.on('sub', sub);
+	THOT.on('!add', add);
+	THOT.on('!sub', sub);
 }
 
 module.exports = {

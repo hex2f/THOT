@@ -36,8 +36,8 @@ function currentPlaying(msg) {
 function init(thot) {
     THOT = thot
 
-    THOT.on('fm', currentPlaying);
-    THOT.on('fmset', fmset);
+    THOT.on('!fm', currentPlaying);
+    THOT.on('!fmset', fmset);
 }
 
 module.exports = {

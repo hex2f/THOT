@@ -34,7 +34,7 @@ function begone(msg) {
 
 function init(thot) {
 	THOT = thot;
-	THOT.on('play', play);
+	THOT.on('!play', play);
 	THOT.on('begone', begone);
 }
 

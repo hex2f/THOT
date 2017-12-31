@@ -26,12 +26,14 @@ client.on('ready', () => {
   });
   
   initSpinner.succeed(`Ready.`)
+
+  client.user.setPresence({ game: { name: 'you.', type: 3 } })
 })
 
 client.on('message', msg => {
-	if(msg.content[0] == config.prefix) {
-		thot.emit(msg.content.split(' ')[0].substr(1), msg)
-	}
+	if(msg.author == client.user) { return; }
+
+	thot.emit(msg.content.split(' ')[0], msg)
 })
 
 const connectingSpinner = ora('Connecting to Discord...').start()
