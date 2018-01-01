@@ -23,6 +23,7 @@
   "homepage": "https://github.com/RekkyRek/THOT#readme",
   "devDependencies": {},
   "dependencies": {
+    "colors": "^1.1.2",
     "discord.js": "github:hydrabolt/discord.js#11.3-dev",
     "erlpack": "github:discordapp/erlpack",
     "node-json-db": "^0.7.3",

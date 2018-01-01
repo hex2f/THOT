@@ -16,6 +16,9 @@ function fmset(msg) {
 }
 
 function currentPlaying(msg) {
+    if(THOT.isDaddy(msg.author)) {
+        console.log('is daddy')
+    }
     try {
         var user = db.getData(`/${msg.author.id}`);
         request(`http://ws.audioscrobbler.com/2.0/?method=user.getrecenttracks&user=${user}&api_key=8a3f54b3b37c3a5e0adda40da34af4fb&format=json`, (err, res, body) => {
