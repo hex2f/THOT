@@ -36,6 +36,8 @@ const client = new Discord.Client()
 
 client.on('ready', () => {
   connectingSpinner.succeed(`Connected to Discord as ${client.user.tag}.`)
+
+  thot.client = client;
   
   const initSpinner = ora('Initializing plugins...').start();
 
@@ -44,7 +46,6 @@ client.on('ready', () => {
   	initSpinner.stopAndPersist({ symbol: '✔', text: `Successfully loaded ${pl.name} ${pl.version}` });
   });
   
-  thot.client = client;
   initSpinner.succeed(`Ready.`)
   
   thot.log('This is a test message');

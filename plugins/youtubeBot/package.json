@@ -14,6 +14,7 @@
   "license": "MIT",
   "dependencies": {
     "opusscript": "0.0.6",
+    "youtube-node": "^1.3.2",
     "ytdl-core": "^0.18.5"
   }
 }

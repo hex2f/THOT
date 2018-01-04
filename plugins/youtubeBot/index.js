@@ -1,22 +1,74 @@
 let THOT;
+let streamOptions = { passes: 3, bitrate: 28000 };
 
 const THOTUtils = require('../../THOTUtils');
+const YouTube = require('youtube-node');
 const ytdl = require('ytdl-core');
 
+const youTube = new YouTube();
+youTube.setKey('AIzaSyCp0bWktjYaLcmrooSzlAxSuydt7zy2MEY');
+
+function search(query, msg, cb) {
+	youTube.search(query, 2, function(error, result) {
+		if (error) {
+			THOT.error(error);
+			msg.react('🇽');
+			msg.channel.send('An error occured.');
+			return error;
+		} else {
+			if(result.items[0] == undefined) {
+				msg.react('🇽');
+				msg.channel.send(`${query} was not found.`);
+				return;
+			}
+			msg.react('✅');
+			cb(msg, result.items[0].id.videoId);
+		}
+	});
+}
+
 function play(msg) {
-	let args = THOTUtils.parseParams(msg.content, [""]);
-	if(args.err) { msg.channel.send('Usage: !play <YOUTUBE ID>'); return; }
-	
+	let id = msg.content.split(' ')[1];
+
+	if(id.indexOf('watch?v=') > -1) { id = id.split('watch?v=')[1]; }
+
+	if(!ytdl.validateID(id)) {
+		let query = msg.content.split(' ');
+		query.shift();
+		query = query.join(' ');
+		search(query, msg, playAudio);
+	} else {
+		playAudio(msg, id);
+	}
+}
+
+function youtube(msg) {
+	let query = msg.content.split(' ');
+	query.shift();
+	query = query.join(' ');
+	if(query.length > 1) {
+		search(query, msg, playAudio);
+	} else {
+		msg.react('🇽')
+	}
+}
+
+function playAudio(msg, id) {
 	if (msg.member.voiceChannel) {
-		msg.member.voiceChannel.join()
-		.then(connection => { // Connection is an instance of VoiceConnection
-			const stream = ytdl(`http://www.youtube.com/watch?v=${args[0]}`);
-			const dispatcher = connection.playStream(stream);
-			dispatcher.on('end', () => {
-				msg.member.voiceChannel.leave();
-			});
-		})
-		.catch(console.log);
+		try {
+			const stream = ytdl(`http://www.youtube.com/watch?v=${id}`, { filter : 'audioonly' });
+			msg.member.voiceChannel.join()
+			.then(connection => { // Connection is an instance of VoiceConnection
+				const dispatcher = connection.playStream(stream, streamOptions);
+				dispatcher.on('end', () => {
+					msg.member.voiceChannel.leave();
+				});
+			})
+			.catch(console.log);
+		} catch(e) {
+			msg.react('🇽');
+			msg.channel.send('Invalid video ID.');
+		}
 	} else {
 		msg.reply('You need to join a voice channel first!');
 	}
@@ -31,10 +83,26 @@ function begone(msg) {
 	}
 }
 
+function developerOptions(msg) {
+	let args = THOTUtils.parseParams(msg.content, [0,0]);
+	if (args.err) {msg.channel.send('usage: !options <passes> <bitrate>')}
+	if(THOT.isDaddy(msg.author)) {
+		streamOptions = { passes: args[0], bitrate: args[1] };
+		msg.react('✅')
+	} else {
+		msg.reply(`You're not my daddy :triumph: :raised_hand:`)
+		msg.react('😤')
+		msg.react('✋')
+	}
+}
+
 
 function init(thot) {
 	THOT = thot;
 	THOT.on('!play', play);
+	THOT.on('!youtube', youtube);
+	THOT.on('!yt', youtube);
+	THOT.on('!options', developerOptions);
 	THOT.on('begone', begone);
 }
 
