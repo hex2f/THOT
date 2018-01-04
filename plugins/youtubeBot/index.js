@@ -29,8 +29,24 @@ function search(query, msg, cb) {
 
 function play(msg) {
 	let id = msg.content.split(' ')[1];
+	let skip = "0s";
 
-	if(id.indexOf('watch?v=') > -1) { id = id.split('watch?v=')[1]; }
+	if(id.indexOf('watch?v=') > -1) {
+		id = id.split('watch?v=')[1];
+		if(id.indexOf('&t=') > -1) {
+			console.log('&t', id.split('&t=')[1])
+			skip = id.split('&t=')[1];
+			id = id.split('&t=')[0];
+		}
+	}
+	if(id.indexOf('youtu.be/') > -1) {
+		id = id.split('youtu.be/')[1];
+		if(id.indexOf('?t=') > -1) {
+			console.log('?t', id.split('?t=')[1])
+			skip = id.split('?t=')[1];
+			id = id.split('?t=')[0];
+		}
+	}
 
 	if(!ytdl.validateID(id)) {
 		let query = msg.content.split(' ');
@@ -38,7 +54,8 @@ function play(msg) {
 		query = query.join(' ');
 		search(query, msg, playAudio);
 	} else {
-		playAudio(msg, id);
+		console.log('before play', skip)
+		playAudio(msg, id, skip);
 	}
 }
 
@@ -53,10 +70,16 @@ function youtube(msg) {
 	}
 }
 
-function playAudio(msg, id) {
+function playAudio(msg, id, skip = "0s") {
+	console.log(skip)
 	if (msg.member.voiceChannel) {
 		try {
-			const stream = ytdl(`http://www.youtube.com/watch?v=${id}`, { filter : 'audioonly' });
+			let stream;
+			if (skip != "0s") {
+				stream = ytdl(`http://www.youtube.com/watch?v=${id}`, { begin: skip });
+			} else {
+				stream = ytdl(`http://www.youtube.com/watch?v=${id}`, { filter: 'audioonly' });
+			}
 			msg.member.voiceChannel.join()
 			.then(connection => { // Connection is an instance of VoiceConnection
 				const dispatcher = connection.playStream(stream, streamOptions);
