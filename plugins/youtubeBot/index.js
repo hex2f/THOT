@@ -95,11 +95,9 @@ function youtube(msg) {
 }
 
 function playQueue(vc, id, skip = "0s", name) {
-	console.log(vc.id, id, skip, name)
 	try {
-		console.log(THOT.config.home)
 		let channel = THOT.client.channels.get(THOT.config.home);
-		channel.send(`Playing ${name}`);
+		channel.send(`Playing **${name}**`);
 		let stream;
 		if (skip != "0s") {
 			stream = ytdl(`http://www.youtube.com/watch?v=${id}`, { begin: skip });
@@ -168,9 +166,13 @@ function sendQueue(msg) {
 	if(vc == undefined) {return;}
 	let str = ``;
 	yt[vc.id].queue.forEach(song => {
-		str += `${song.name}\n`;
+		str += `**${song.name}**\n`;
 	});
-	msg.channel.send(str);
+	if(str.length > 0) {
+		msg.channel.send(str);
+	} else {
+		msg.channel.send('**There are no songs in the queue.**');		
+	}
 }
 
 function init(thot) {
