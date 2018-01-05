@@ -9,11 +9,13 @@ let plugins = require('./plugins.js').find((pl)=>{
 
 lookingSpinner.succeed('Done searching for plugins.')
 
+const fs = require('fs')
 const EventEmitter = require('events')
+const THOTUtils = require('./THOTUtils');
 
 class THOTBot extends EventEmitter {
   isDaddy(user) {
-    return `${user.username}#${user.discriminator}` == config.daddy;
+    if(config.daddy[`${user.username}#${user.discriminator}`] == "true") {return true;} else {return false;}
   }
   log(msg) {
     var time = new Date();
@@ -37,6 +39,7 @@ const client = new Discord.Client()
 client.on('ready', () => {
   connectingSpinner.succeed(`Connected to Discord as ${client.user.tag}.`)
 
+  thot.config = config;
   thot.client = client;
   
   const initSpinner = ora('Initializing plugins...').start();
@@ -47,10 +50,21 @@ client.on('ready', () => {
   });
   
   initSpinner.succeed(`Ready.`)
-  
-  thot.log('This is a test message');
-  thot.warn('This is a test warning');
-  thot.error('This is a test error');
+
+  thot.on('!setdaddy', (msg) => {
+    if(!thot.isDaddy(msg.author)) {
+      msg.reply(`You're not my daddy :triumph: :raised_hand:`)
+      msg.react('😤')
+      msg.react('✋')
+      return;
+    }
+    let args = THOTUtils.parseParams(msg.content, ["",""]);
+    if(args.err) {msg.channel.send('Usage: !setdaddy <true || false> <usertag>')}
+    config.daddy[args[1]] = args[0];
+    thot.config = config;
+    fs.writeFile('./config.json', JSON.stringify(config));
+    msg.react('✅');
+  })
 
   client.user.setPresence({ game: { name: 'you.', type: 3 } })
 })

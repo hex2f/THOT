@@ -5,6 +5,8 @@ const THOTUtils = require('../../THOTUtils');
 const YouTube = require('youtube-node');
 const ytdl = require('ytdl-core');
 
+let yt = {};
+
 const youTube = new YouTube();
 youTube.setKey('AIzaSyCp0bWktjYaLcmrooSzlAxSuydt7zy2MEY');
 
@@ -21,8 +23,7 @@ function search(query, msg, cb) {
 				msg.channel.send(`${query} was not found.`);
 				return;
 			}
-			msg.react('✅');
-			cb(msg, result.items[0].id.videoId);
+			cb(msg, result.items[0].id.videoId, result.items[0].snippet.title);
 		}
 	});
 }
@@ -30,6 +31,12 @@ function search(query, msg, cb) {
 function play(msg) {
 	let id = msg.content.split(' ')[1];
 	let skip = "0s";
+
+	if(!msg.member.voiceChannel) {msg.reply('You need to join a voice channel first!'); return;}
+	
+	const vc = msg.member.voiceChannel;
+
+	if(yt[vc.id] == undefined) { yt[vc.id] = {vc: vc, queue: [], dispatcher: null}; }
 
 	if(id.indexOf('watch?v=') > -1) {
 		id = id.split('watch?v=')[1];
@@ -52,10 +59,27 @@ function play(msg) {
 		let query = msg.content.split(' ');
 		query.shift();
 		query = query.join(' ');
-		search(query, msg, playAudio);
+		search(query, msg, (msg, id, name)=>{
+			yt[vc.id].queue.push({id, skip, name})
+			msg.channel.send(`Added **${name}** to the queue.`)
+			if(yt[vc.id].queue.length == 1) {
+				playQueue(vc, id, skip, name);
+			}
+		});
 	} else {
-		console.log('before play', skip)
-		playAudio(msg, id, skip);
+		youTube.getById(id, function(error, result) {
+			if (error) {
+				msg.react('🇽');
+				msg.channel.send('Invalid video.');
+				return;
+			} else {
+				yt[vc.id].queue.push({id, skip, name: result.items[0].snippet.title})
+				msg.channel.send(`Added **${result.items[0].snippet.title}** to the queue.`)
+				if(yt[vc.id].queue.length == 1) {
+					playQueue(vc, id, skip, result.items[0].snippet.title);
+				}
+			}
+		});
 	}
 }
 
@@ -70,39 +94,59 @@ function youtube(msg) {
 	}
 }
 
-function playAudio(msg, id, skip = "0s") {
-	console.log(skip)
-	if (msg.member.voiceChannel) {
-		try {
-			let stream;
-			if (skip != "0s") {
-				stream = ytdl(`http://www.youtube.com/watch?v=${id}`, { begin: skip });
-			} else {
-				stream = ytdl(`http://www.youtube.com/watch?v=${id}`, { filter: 'audioonly' });
-			}
-			msg.member.voiceChannel.join()
-			.then(connection => { // Connection is an instance of VoiceConnection
-				const dispatcher = connection.playStream(stream, streamOptions);
-				dispatcher.on('end', () => {
-					msg.member.voiceChannel.leave();
-				});
-			})
-			.catch(console.log);
-		} catch(e) {
-			msg.react('🇽');
-			msg.channel.send('Invalid video ID.');
+function playQueue(vc, id, skip = "0s", name) {
+	console.log(vc.id, id, skip, name)
+	try {
+		console.log(THOT.config.home)
+		let channel = THOT.client.channels.get(THOT.config.home);
+		channel.send(`Playing ${name}`);
+		let stream;
+		if (skip != "0s") {
+			stream = ytdl(`http://www.youtube.com/watch?v=${id}`, { begin: skip });
+		} else {
+			stream = ytdl(`http://www.youtube.com/watch?v=${id}`, { filter: 'audioonly' });
 		}
-	} else {
-		msg.reply('You need to join a voice channel first!');
+		yt[vc.id].vc.join()
+		.then(connection => { // Connection is an instance of VoiceConnection
+			yt[vc.id].dispatcher = connection.playStream(stream, streamOptions);
+			yt[vc.id].dispatcher.on('end', () => {
+				yt[vc.id].queue.shift();
+				if(yt[vc.id].queue.length == 0) {
+					yt[vc.id].vc.leave();
+				} else {
+					setTimeout(()=>{
+						playQueue(vc, yt[vc.id].queue[0].id, yt[vc.id].queue[0].skip, yt[vc.id].queue[0].name);
+					}, 250);
+				}
+			});
+		})
+		.catch(THOT.error);
+	} catch(e) {
+		console.log(e)
 	}
 }
 
 function begone(msg) {
 	if (msg.member.voiceChannel) {
-		msg.channel.send('no thots :flushed: :flushed: :flushed:');
 		msg.member.voiceChannel.leave();
 	} else {
 		msg.channel.send('but DADDY OwO');
+	}
+}
+
+function skip(msg) {
+	let vc = msg.member.voiceChannel;
+	if(vc == undefined) {return;}
+	if(!THOT.isDaddy(msg.author)) {
+		msg.reply(`You're not my daddy :triumph: :raised_hand:`)
+		msg.react('😤')
+		msg.react('✋')
+		return;
+	}
+	if(yt[vc.id].queue.length > 0) {
+		if(yt[vc.id].dispatcher) {
+			yt[vc.id].dispatcher.end();
+		}
 	}
 }
 
@@ -119,6 +163,15 @@ function developerOptions(msg) {
 	}
 }
 
+function sendQueue(msg) {
+	let vc = msg.member.voiceChannel;
+	if(vc == undefined) {return;}
+	let str = ``;
+	yt[vc.id].queue.forEach(song => {
+		str += `${song.name}\n`;
+	});
+	msg.channel.send(str);
+}
 
 function init(thot) {
 	THOT = thot;
@@ -126,6 +179,8 @@ function init(thot) {
 	THOT.on('!youtube', youtube);
 	THOT.on('!yt', youtube);
 	THOT.on('!options', developerOptions);
+	THOT.on('!queue', sendQueue);
+	THOT.on('!skip', skip);
 	THOT.on('begone', begone);
 }
 
