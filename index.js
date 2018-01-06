@@ -3,6 +3,7 @@ const ora = require('ora')
 const lookingSpinner = ora('Searching for plugins...').start()
 
 const config = require('./config.json')
+const token = require('../botToken.json')
 let plugins = require('./plugins.js').find((pl)=>{
 	lookingSpinner.stopAndPersist({ symbol: '✔', text: `Found ${pl.name} ${pl.version}` })
 })
@@ -75,4 +76,4 @@ client.on('message', msg => {
 })
 
 const connectingSpinner = ora('Connecting to Discord...').start()
-client.login(config.token)
+client.login(token.token)

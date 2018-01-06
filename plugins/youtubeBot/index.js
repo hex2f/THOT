@@ -120,7 +120,14 @@ function playQueue(vc, id, skip = "0s", name) {
 		})
 		.catch(THOT.error);
 	} catch(e) {
-		console.log(e)
+		yt[vc.id].queue.shift();
+		if(yt[vc.id].queue.length == 0) {
+			yt[vc.id].vc.leave();
+		} else {
+			setTimeout(()=>{
+				playQueue(vc, yt[vc.id].queue[0].id, yt[vc.id].queue[0].skip, yt[vc.id].queue[0].name);
+			}, 250);
+		}
 	}
 }
 
@@ -142,9 +149,28 @@ function skip(msg) {
 		return;
 	}
 	if(yt[vc.id].queue.length > 0) {
+		msg.channel.send(`Skipped **${yt[vc.id].queue[0].name}**`)
 		if(yt[vc.id].dispatcher) {
 			yt[vc.id].dispatcher.end();
 		}
+	}
+}
+
+function clear(msg) {
+	let vc = msg.member.voiceChannel;
+	if(vc == undefined) {return;}
+	if(!THOT.isDaddy(msg.author)) {
+		msg.reply(`You're not my daddy :triumph: :raised_hand:`)
+		msg.react('😤')
+		msg.react('✋')
+		return;
+	}
+	if(yt[vc.id].queue.length > 0) {
+		yt[vc.id].queue = [];
+		if(yt[vc.id].dispatcher) {
+			yt[vc.id].dispatcher.end();
+		}
+		msg.channel.send('**Cleared the queue.**')
 	}
 }
 
@@ -182,6 +208,7 @@ function init(thot) {
 	THOT.on('!yt', youtube);
 	THOT.on('!options', developerOptions);
 	THOT.on('!queue', sendQueue);
+	THOT.on('!clear', clear);
 	THOT.on('!skip', skip);
 	THOT.on('begone', begone);
 }
