@@ -30,6 +30,46 @@ class THOTBot extends EventEmitter {
     var time = new Date();
     console.log(`🚫 [${time.getHours()}:${time.getMinutes()}:${time.getSeconds()}]`.red, msg)
   }
+  notMyDaddy(msg) {
+    msg.reply(`You're not my daddy :triumph: :raised_hand:`)
+    msg.react('😤')
+    msg.react('✋')
+  }
+  init() {
+    this.on('!setdaddy', (msg) => {
+      if(!this.isDaddy(msg.author)) {
+        this.notMyDaddy(msg);
+        return;
+      }
+      let args = THOTUtils.parseParams(msg.content, ["",""]);
+      if(args.err) {msg.channel.send('Usage: !setdaddy <true || false> <usertag>'); msg.react('🇽'); return;}
+      config.daddy[args[1]] = args[0];
+      this.config = config;
+      fs.writeFile('./config.json', JSON.stringify(config));
+      msg.react('✅');
+    })
+    this.on('!plugins', (msg)=>{
+      let str = ``;
+      plugins.forEach(plugin => {
+        str += `**${plugin.name}** ${plugin.version}\n`;
+      });
+      if(str.length > 0) {
+        msg.channel.send(str);
+      } else {
+        msg.channel.send('No plugins installed.');		
+      }
+    })
+    this.on('!reload', (msg)=>{
+      if(!this.isDaddy(msg.author)) {
+        this.notMyDaddy(msg);
+        return;
+      }
+      msg.react('✅');
+      setTimeout(()=>{
+        process.exit();
+      }, 250);
+    })
+  }
 }
 
 const thot = new THOTBot()
@@ -43,6 +83,8 @@ client.on('ready', () => {
   thot.config = config;
   thot.client = client;
   
+  thot.init();
+
   const initSpinner = ora('Initializing plugins...').start();
 
   require('./plugins.js').init(plugins, thot, (err, pl) => {
@@ -51,21 +93,6 @@ client.on('ready', () => {
   });
   
   initSpinner.succeed(`Ready.`)
-
-  thot.on('!setdaddy', (msg) => {
-    if(!thot.isDaddy(msg.author)) {
-      msg.reply(`You're not my daddy :triumph: :raised_hand:`)
-      msg.react('😤')
-      msg.react('✋')
-      return;
-    }
-    let args = THOTUtils.parseParams(msg.content, ["",""]);
-    if(args.err) {msg.channel.send('Usage: !setdaddy <true || false> <usertag>')}
-    config.daddy[args[1]] = args[0];
-    thot.config = config;
-    fs.writeFile('./config.json', JSON.stringify(config));
-    msg.react('✅');
-  })
 
   client.user.setPresence({ game: { name: 'you.', type: 3 } })
 })

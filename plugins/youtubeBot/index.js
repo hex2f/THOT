@@ -84,11 +84,21 @@ function play(msg) {
 }
 
 function youtube(msg) {
+	if(!msg.member.voiceChannel) {msg.reply('You need to join a voice channel first!'); return;}
+	
+	const vc = msg.member.voiceChannel;
+	
 	let query = msg.content.split(' ');
 	query.shift();
 	query = query.join(' ');
 	if(query.length > 1) {
-		search(query, msg, playAudio);
+		search(query, msg, (msg, id, name)=>{
+			yt[vc.id].queue.push({id, skip, name})
+			msg.channel.send(`Added **${name}** to the queue.`)
+			if(yt[vc.id].queue.length == 1) {
+				playQueue(vc, id, skip, name);
+			}
+		});
 	} else {
 		msg.react('🇽')
 	}
@@ -143,9 +153,7 @@ function skip(msg) {
 	let vc = msg.member.voiceChannel;
 	if(vc == undefined) {return;}
 	if(!THOT.isDaddy(msg.author)) {
-		msg.reply(`You're not my daddy :triumph: :raised_hand:`)
-		msg.react('😤')
-		msg.react('✋')
+		THOT.notMyDaddy(msg);
 		return;
 	}
 	if(yt[vc.id].queue.length > 0) {
@@ -160,9 +168,7 @@ function clear(msg) {
 	let vc = msg.member.voiceChannel;
 	if(vc == undefined) {return;}
 	if(!THOT.isDaddy(msg.author)) {
-		msg.reply(`You're not my daddy :triumph: :raised_hand:`)
-		msg.react('😤')
-		msg.react('✋')
+		THOT.notMyDaddy(msg);
 		return;
 	}
 	if(yt[vc.id].queue.length > 0) {
@@ -181,9 +187,7 @@ function developerOptions(msg) {
 		streamOptions = { passes: args[0], bitrate: args[1] };
 		msg.react('✅')
 	} else {
-		msg.reply(`You're not my daddy :triumph: :raised_hand:`)
-		msg.react('😤')
-		msg.react('✋')
+		THOT.notMyDaddy(msg);
 	}
 }
 
