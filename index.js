@@ -37,13 +37,19 @@ class THOTBot extends EventEmitter {
   }
   init() {
     this.on('!setdaddy', (msg) => {
-      if(!this.isDaddy(msg.author)) {
-        this.notMyDaddy(msg);
-        return;
-      }
+      if(!this.isDaddy(msg.author)) { this.notMyDaddy(msg); return; }
       let args = THOTUtils.parseParams(msg.content, ["",""]);
       if(args.err) {msg.channel.send('Usage: !setdaddy <true || false> <usertag>'); msg.react('🇽'); return;}
       config.daddy[args[1]] = args[0];
+      this.config = config;
+      fs.writeFile('./config.json', JSON.stringify(config));
+      msg.react('✅');
+    })
+    this.on('!set', (msg) => {
+      if(!this.isDaddy(msg.author)) { this.notMyDaddy(msg); return; }
+      let args = THOTUtils.parseParams(msg.content, ["",""]);
+      if(args.err) {msg.channel.send('Usage: !set <variable> <value>'); msg.react('🇽'); return;}
+      config[args[0]] = args[1];
       this.config = config;
       fs.writeFile('./config.json', JSON.stringify(config));
       msg.react('✅');
@@ -68,6 +74,12 @@ class THOTBot extends EventEmitter {
       setTimeout(()=>{
         process.exit();
       }, 250);
+    })
+    this.on('THOTFunction_guildMemberAdd', (member) => {
+      let role = this.client.guilds.get(this.config.guildID).roles.find("name", this.config.defaultRole);
+      if(role != undefined) {
+        member.addRole(role).catch(this.error);
+      }
     })
   }
 }
@@ -100,6 +112,10 @@ client.on('ready', () => {
 client.on('message', msg => {
   if(msg.author == client.user) { return; }
 	thot.emit(msg.content.split(' ')[0], msg)
+})
+
+client.on('guildMemberAdd', member => {
+	thot.emit(`THOTFunction_guildMemberAdd`, member)
 })
 
 const connectingSpinner = ora('Connecting to Discord...').start()
