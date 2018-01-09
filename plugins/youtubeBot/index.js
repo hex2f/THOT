@@ -15,12 +15,12 @@ function search(query, msg, cb) {
 		if (error) {
 			THOT.error(error);
 			msg.react('🇽');
-			msg.channel.send('An error occured.');
+			THOT.reply(msg, 'Music Error', 'An error occured.');
 			return error;
 		} else {
 			if(result.items[0] == undefined) {
 				msg.react('🇽');
-				msg.channel.send(`${query} was not found.`);
+				THOT.reply(msg, 'Music Error', `${query} was not found.`);
 				return;
 			}
 			cb(msg, result.items[0].id.videoId, result.items[0].snippet.title);
@@ -61,7 +61,7 @@ function play(msg) {
 		query = query.join(' ');
 		search(query, msg, (msg, id, name)=>{
 			yt[vc.id].queue.push({id, skip, name})
-			msg.channel.send(`Added **${name}** to the queue.`)
+			THOT.reply(msg, 'Music Queue', `Added **${name}** to the queue.`)
 			if(yt[vc.id].queue.length == 1) {
 				playQueue(vc, id, skip, name);
 			}
@@ -70,11 +70,11 @@ function play(msg) {
 		youTube.getById(id, function(error, result) {
 			if (error) {
 				msg.react('🇽');
-				msg.channel.send('Invalid video.');
+				THOT.reply(msg, 'Music Error', 'Invalid video.');
 				return;
 			} else {
 				yt[vc.id].queue.push({id, skip, name: result.items[0].snippet.title})
-				msg.channel.send(`Added **${result.items[0].snippet.title}** to the queue.`)
+				THOT.reply(msg, 'Music Queue', `Added **${result.items[0].snippet.title}** to the queue.`)
 				if(yt[vc.id].queue.length == 1) {
 					playQueue(vc, id, skip, result.items[0].snippet.title);
 				}
@@ -94,7 +94,7 @@ function youtube(msg) {
 	if(query.length > 1) {
 		search(query, msg, (msg, id, name)=>{
 			yt[vc.id].queue.push({id, skip, name})
-			msg.channel.send(`Added **${name}** to the queue.`)
+			THOT.reply(msg, 'Music Queue', `Added **${name}** to the queue.`)
 			if(yt[vc.id].queue.length == 1) {
 				playQueue(vc, id, skip, name);
 			}
@@ -145,7 +145,7 @@ function begone(msg) {
 	if (msg.member.voiceChannel) {
 		msg.member.voiceChannel.leave();
 	} else {
-		msg.channel.send('but DADDY OwO');
+		THOT.reply(msg, 'OwO', 'but DADDY OwO');
 	}
 }
 
@@ -157,7 +157,7 @@ function skip(msg) {
 		return;
 	}
 	if(yt[vc.id].queue.length > 0) {
-		msg.channel.send(`Skipped **${yt[vc.id].queue[0].name}**`)
+		THOT.reply(msg, 'Music Queue', `Skipped **${yt[vc.id].queue[0].name}**`)
 		if(yt[vc.id].dispatcher) {
 			yt[vc.id].dispatcher.end();
 		}
@@ -176,13 +176,13 @@ function clear(msg) {
 		if(yt[vc.id].dispatcher) {
 			yt[vc.id].dispatcher.end();
 		}
-		msg.channel.send('**Cleared the queue.**')
+		THOT.reply(msg, 'Music Queue', '**Cleared the queue.**')
 	}
 }
 
 function developerOptions(msg) {
 	let args = THOTUtils.parseParams(msg.content, [0,0]);
-	if (args.err) {msg.channel.send('usage: !options <passes> <bitrate>')}
+	if (args.err) {THOT.reply(msg, 'Usage Error', 'Usage: !options <passes> <bitrate>')}
 	if(THOT.isDaddy(msg.author)) {
 		streamOptions = { passes: args[0], bitrate: args[1] };
 		msg.react('✅')
@@ -199,9 +199,9 @@ function sendQueue(msg) {
 		str += `**${song.name}**\n`;
 	});
 	if(str.length > 0) {
-		msg.channel.send(str);
+		THOT.reply(msg, 'Music Queue', str);
 	} else {
-		msg.channel.send('**There are no songs in the queue.**');		
+		THOT.reply(msg, 'Music Queue', '**There are no songs in the queue.**');		
 	}
 }
 
