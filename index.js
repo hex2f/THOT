@@ -35,6 +35,17 @@ class THOTBot extends EventEmitter {
     msg.react('😤')
     msg.react('✋')
   }
+  reply(msg, title, description) {
+    const embed = new Discord.RichEmbed({
+      title,
+      description
+    });
+    msg.channel.send(embed);
+  }
+  richReply(msg, data) {
+    const embed = new Discord.RichEmbed(data);
+    msg.channel.send(embed);
+  }
   init() {
     this.on('!setdaddy', (msg) => {
       if(!this.isDaddy(msg.author)) { this.notMyDaddy(msg); return; }
@@ -111,6 +122,7 @@ client.on('ready', () => {
 
 client.on('message', msg => {
   if(msg.author == client.user) { return; }
+  thot.reply(msg, 'Hello World', 'This is a test of rich embeds!')
 	thot.emit(msg.content.split(' ')[0], msg)
 })
 
