@@ -25,10 +25,10 @@ function currentPlaying(msg) {
             if(err) {throw err; return;}
             let data = JSON.parse(body).recenttracks;
             let str = `**Current**: ${data.track[0].artist['#text']} - ${data.track[0].name}\n**Previous**: ${data.track[1].artist['#text']} - ${data.track[1].name}`;
-            msg.channel.send(str);
+            THOT.reply(msg, `${user}'s LastFM`, str, 12189696);
         });
     } catch(error) {
-        msg.channel.send('You need to set your lastfm username using !fmset <Username>');
+        THOT.reply(msg, 'LastFM', 'You need to set your lastfm username using !fmset <Username>', 12189696);
     }
 }
 

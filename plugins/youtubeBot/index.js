@@ -59,7 +59,7 @@ function play(msg) {
 		query = query.join(' ');
 		search(query, msg, (msg, id, name)=>{
 			yt[vc.id].queue.push({id, skip, name})
-			THOT.reply(msg, 'Music Queue', `Added **${name}** to the queue.`)
+			THOT.reply(msg, 'Music Queue', `Added [**${name}**](https://youtu.be/${id}) to the queue.`, 16711680)
 			if(yt[vc.id].queue.length == 1) {
 				playQueue(vc, id, skip, name);
 			}
@@ -70,10 +70,8 @@ function play(msg) {
 				THOT.reply(msg, 'Music Error', 'Invalid video.');
 				return;
 			} else {
-				console.log(yt[vc.id].queue)
 				yt[vc.id].queue.push({id, skip, name: result.items[0].snippet.title})
-				console.log(yt[vc.id].queue)
-				THOT.reply(msg, 'Music Queue', `Added **${result.items[0].snippet.title}** to the queue.`)
+				THOT.reply(msg, 'Music Queue', `Added [**${result.items[0].snippet.title}**](https://youtu.be/${id}) to the queue.`, 16711680)
 				if(yt[vc.id].queue.length == 1) {
 					playQueue(vc, id, skip, result.items[0].snippet.title);
 				}
@@ -93,7 +91,7 @@ function youtube(msg) {
 	if(query.length > 1) {
 		search(query, msg, (msg, id, name)=>{
 			yt[vc.id].queue.push({id, skip, name})
-			THOT.reply(msg, 'Music Queue', `Added **${name}** to the queue.`)
+			THOT.reply(msg, 'Music Queue', `Added [**${name}**](https://youtu.be/${id}) to the queue.`, 16711680)
 			if(yt[vc.id].queue.length == 1) {
 				playQueue(vc, id, skip, name);
 			}
@@ -106,7 +104,7 @@ function youtube(msg) {
 function playQueue(vc, id, skip = "0s", name) {
 	try {
 		let msg = {channel: THOT.client.channels.get(THOT.config.home)};
-		THOT.reply(msg, 'Music Queue', `Playing **${name}**`);
+		THOT.reply(msg, 'Music Queue', `Playing [**${name}**](https://youtu.be/${id})`, 16711680);
 		let stream;
 		if (skip != "0s") {
 			stream = ytdl(`https://www.youtube.com/watch?v=${id}`, { begin: skip });
