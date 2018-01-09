@@ -122,7 +122,6 @@ client.on('ready', () => {
 
 client.on('message', msg => {
   if(msg.author == client.user) { return; }
-  thot.reply(msg, 'Hello World', 'This is a test of rich embeds!')
 	thot.emit(msg.content.split(' ')[0], msg)
 })
 

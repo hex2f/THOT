@@ -14,12 +14,10 @@ function search(query, msg, cb) {
 	youTube.search(query, 2, function(error, result) {
 		if (error) {
 			THOT.error(error);
-			msg.react('🇽');
 			THOT.reply(msg, 'Music Error', 'An error occured.');
 			return error;
 		} else {
 			if(result.items[0] == undefined) {
-				msg.react('🇽');
 				THOT.reply(msg, 'Music Error', `${query} was not found.`);
 				return;
 			}
@@ -69,11 +67,12 @@ function play(msg) {
 	} else {
 		youTube.getById(id, function(error, result) {
 			if (error) {
-				msg.react('🇽');
 				THOT.reply(msg, 'Music Error', 'Invalid video.');
 				return;
 			} else {
+				console.log(yt[vc.id].queue)
 				yt[vc.id].queue.push({id, skip, name: result.items[0].snippet.title})
+				console.log(yt[vc.id].queue)
 				THOT.reply(msg, 'Music Queue', `Added **${result.items[0].snippet.title}** to the queue.`)
 				if(yt[vc.id].queue.length == 1) {
 					playQueue(vc, id, skip, result.items[0].snippet.title);
@@ -106,13 +105,13 @@ function youtube(msg) {
 
 function playQueue(vc, id, skip = "0s", name) {
 	try {
-		let channel = THOT.client.channels.get(THOT.config.home);
-		channel.send(`Playing **${name}**`);
+		let msg = {channel: THOT.client.channels.get(THOT.config.home)};
+		THOT.reply(msg, 'Music Queue', `Playing **${name}**`);
 		let stream;
 		if (skip != "0s") {
-			stream = ytdl(`http://www.youtube.com/watch?v=${id}`, { begin: skip });
+			stream = ytdl(`https://www.youtube.com/watch?v=${id}`, { begin: skip });
 		} else {
-			stream = ytdl(`http://www.youtube.com/watch?v=${id}`, { filter: 'audioonly' });
+			stream = ytdl(`https://www.youtube.com/watch?v=${id}`, { filter: 'audioonly' });
 		}
 		yt[vc.id].vc.join()
 		.then(connection => { // Connection is an instance of VoiceConnection
@@ -130,6 +129,7 @@ function playQueue(vc, id, skip = "0s", name) {
 		})
 		.catch(THOT.error);
 	} catch(e) {
+		THOT.error(e);
 		yt[vc.id].queue.shift();
 		if(yt[vc.id].queue.length == 0) {
 			yt[vc.id].vc.leave();
