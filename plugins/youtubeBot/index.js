@@ -10,8 +10,8 @@ let yt = {};
 const youTube = new YouTube();
 youTube.setKey('AIzaSyCp0bWktjYaLcmrooSzlAxSuydt7zy2MEY');
 
-function search(query, msg, cb) {
-	youTube.search(query, 2, function(error, result) {
+function search(query, msg, amount = 2, cb) {
+	youTube.search(query, amount, function(error, result) {
 		if (error) {
 			THOT.error(error);
 			THOT.reply(msg, 'Music Error', 'An error occured.');
@@ -29,6 +29,8 @@ function search(query, msg, cb) {
 function play(msg) {
 	let id = msg.content.split(' ')[1];
 	let skip = "0s";
+
+	if(id == undefined) {msg.reply('Usage: **!play <search || id>**'); return;}
 
 	if(!msg.member.voiceChannel) {msg.reply('You need to join a voice channel first!'); return;}
 	
@@ -57,7 +59,7 @@ function play(msg) {
 		let query = msg.content.split(' ');
 		query.shift();
 		query = query.join(' ');
-		search(query, msg, (msg, id, name)=>{
+		search(query, msg, 2, (msg, id, name)=>{
 			yt[vc.id].queue.push({id, skip, name})
 			THOT.reply(msg, 'Music Queue', `Added [**${name}**](https://youtu.be/${id}) to the queue.`, 16711680)
 			if(yt[vc.id].queue.length == 1) {
@@ -81,13 +83,14 @@ function play(msg) {
 }
 
 function youtube(msg) {
-	if(!msg.member.voiceChannel) {msg.reply('You need to join a voice channel first!'); return;}
-	
-	const vc = msg.member.voiceChannel;
-	
 	let query = msg.content.split(' ');
 	query.shift();
 	query = query.join(' ');
+
+	if(query == '') {msg.reply('Usage: **!yt <search query>**'); return;}
+	if(!msg.member.voiceChannel) {msg.reply('You need to join a voice channel first!'); return;}
+	
+	const vc = msg.member.voiceChannel;
 	if(query.length > 1) {
 		search(query, msg, (msg, id, name)=>{
 			yt[vc.id].queue.push({id, skip, name})
