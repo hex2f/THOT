@@ -109,7 +109,7 @@ function youtube(msg) {
 					emojis.forEach(e => {
 						setTimeout(()=>{
 							message.react(e).catch(()=>{});
-						}, 650 * emojis.indexOf(e))
+						}, 750 * emojis.indexOf(e))
 					})
 
 					const onReact = (data) => {
