@@ -1,5 +1,5 @@
 let THOT;
-let streamOptions = { passes: 3, bitrate: 28000 };
+let streamOptions = { passes: 4, bitrate: 28000 };
 
 const THOTUtils = require('../../THOTUtils');
 const YouTube = require('youtube-node');
@@ -21,7 +21,11 @@ function search(query, msg, amount = 2, cb) {
 				THOT.reply(msg, 'Music Error', `${query} was not found.`);
 				return;
 			}
-			cb(msg, result.items[0].id.videoId, result.items[0].snippet.title);
+			if(amount > 2) {
+				cb(msg, result.items);
+			} else {
+				cb(msg, result.items[0].id.videoId, result.items[0].snippet.title);
+			}
 		}
 	});
 }
@@ -90,14 +94,55 @@ function youtube(msg) {
 	if(query == '') {msg.reply('Usage: **!yt <search query>**'); return;}
 	if(!msg.member.voiceChannel) {msg.reply('You need to join a voice channel first!'); return;}
 	
-	const vc = msg.member.voiceChannel;
+	let vc = msg.member.voiceChannel;
 	if(query.length > 1) {
-		search(query, msg, (msg, id, name)=>{
-			yt[vc.id].queue.push({id, skip, name})
+		search(query, msg, 10, (msg, results)=>{
+			let emojis = ['1⃣', '2⃣', '3⃣', '4⃣', '5⃣', '6⃣', '7⃣', '8⃣', '9⃣', '🔟' ];
+			let str = '';
+
+			results.forEach(result => {
+				str += `${emojis[results.indexOf(result)]} ${result.snippet.title}\n`;
+			})
+			
+			THOT.reply(msg, 'Music Search', str, 16711680)
+				.then(message => {
+					emojis.forEach(e => {
+						setTimeout(()=>{
+							message.react(e).catch(()=>{});
+						}, 650 * emojis.indexOf(e))
+					})
+
+					const onReact = (data) => {
+						if(data.user.id != THOT.client.user.id) {
+							if(data.reaction.message.id == message.id && data.user.id == msg.author.id) {
+								if(emojis.indexOf(data.reaction.emoji.toString()) > -1) {
+
+									vc = msg.member.voiceChannel;
+									if(yt[vc.id] == undefined) { yt[vc.id] = {vc: vc, queue: [], dispatcher: null}; }
+
+									const index = emojis.indexOf(data.reaction.emoji.toString());
+									yt[vc.id].queue.push({id: results[index].id.videoId, skip: "0s", name: results[index].snippet.title})
+									THOT.reply(msg, 'Music Queue', `Added [**${results[index].snippet.title}**](https://youtu.be/${results[index].id.videoId}) to the queue.`, 16711680)
+									
+									if(yt[vc.id].queue.length == 1) {
+										playQueue(vc, results[index].id.videoId, "0s", results[index].snippet.title);
+									}
+
+									THOT.removeListener('THOTFunction_messageReactionAdd', onReact);
+									message.delete();
+								}
+							}
+						}
+					}
+
+					THOT.on('THOTFunction_messageReactionAdd', onReact);
+				})
+				.catch(console.error);
+			/*yt[vc.id].queue.push({id, skip, name})
 			THOT.reply(msg, 'Music Queue', `Added [**${name}**](https://youtu.be/${id}) to the queue.`, 16711680)
 			if(yt[vc.id].queue.length == 1) {
 				playQueue(vc, id, skip, name);
-			}
+			}*/
 		});
 	} else {
 		msg.react('🇽')
@@ -215,7 +260,7 @@ function init(thot) {
 	THOT.on('!queue', sendQueue);
 	THOT.on('!clear', clear);
 	THOT.on('!skip', skip);
-	THOT.on('begone', begone);
+	THOT.on('begone', begone);	
 }
 
 module.exports = {

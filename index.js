@@ -43,7 +43,7 @@ class THOTBot extends EventEmitter {
       url,
       image
     });
-    msg.channel.send(embed);
+    return msg.channel.send(embed);
   }
   richReply(msg, data) {
     const embed = new Discord.RichEmbed(data);
@@ -131,6 +131,11 @@ client.on('message', msg => {
 client.on('guildMemberAdd', member => {
 	thot.emit(`THOTFunction_guildMemberAdd`, member)
 })
+
+client.on('messageReactionAdd', (reaction, user) => {
+	thot.emit(`THOTFunction_messageReactionAdd`, {reaction, user})
+})
+
 
 const connectingSpinner = ora('Connecting to Discord...').start()
 client.login(token.token)
