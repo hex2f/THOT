@@ -106,21 +106,27 @@ function youtube(msg) {
 			
 			THOT.reply(msg, 'Music Search', str, 16711680)
 				.then(message => {
-					emojis.forEach(e => {
-						setTimeout(()=>{
-							message.react(e).catch(()=>{});
-						}, 750 * emojis.indexOf(e))
-					})
+					let i = 0;
+
+					const react = () => {
+						i++;
+						if(i > emojis.length) { return; }
+						message.react(emojis[i-1]).then(react).catch(()=>{})
+					};
+
+					react();
 
 					const onReact = (data) => {
 						if(data.user.id != THOT.client.user.id) {
 							if(data.reaction.message.id == message.id && data.user.id == msg.author.id) {
 								if(emojis.indexOf(data.reaction.emoji.toString()) > -1) {
+									const index = emojis.indexOf(data.reaction.emoji.toString());
+									
+									if(!ytdl.validateID(results[index].id.videoId)) {msg.reply('Oops, looks like that option didn\'t have a valid ID.'); return;}
 
 									vc = msg.member.voiceChannel;
 									if(yt[vc.id] == undefined) { yt[vc.id] = {vc: vc, queue: [], dispatcher: null}; }
 
-									const index = emojis.indexOf(data.reaction.emoji.toString());
 									yt[vc.id].queue.push({id: results[index].id.videoId, skip: "0s", name: results[index].snippet.title})
 									THOT.reply(msg, 'Music Queue', `Added [**${results[index].snippet.title}**](https://youtu.be/${results[index].id.videoId}) to the queue.`, 16711680)
 									
