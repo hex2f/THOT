@@ -35,7 +35,7 @@ class THOTBot extends EventEmitter {
     msg.react('😤')
     msg.react('✋')
   }
-  reply(msg, title, description, color = '#ffffff', url = null, image = null) {
+  reply(msg, title, description, color = 16711680, url = null, image = null) {
     const embed = new Discord.RichEmbed({
       title,
       description,

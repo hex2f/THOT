@@ -64,7 +64,7 @@ function play(msg) {
 		query.shift();
 		query = query.join(' ');
 		search(query, msg, 2, (msg, id, name)=>{
-			yt[vc.id].queue.push({id, skip, name})
+			yt[vc.id].queue.push({id, skip, name, requestedBy: msg.member.id })
 			THOT.reply(msg, 'Music Queue', `Added [**${name}**](https://youtu.be/${id}) to the queue.`, 16711680)
 			if(yt[vc.id].queue.length == 1) {
 				playQueue(vc, id, skip, name);
@@ -76,7 +76,7 @@ function play(msg) {
 				THOT.reply(msg, 'Music Error', 'Invalid video.');
 				return;
 			} else {
-				yt[vc.id].queue.push({id, skip, name: result.items[0].snippet.title})
+				yt[vc.id].queue.push({id, skip, name: result.items[0].snippet.title, requestedBy: msg.member.id })
 				THOT.reply(msg, 'Music Queue', `Added [**${result.items[0].snippet.title}**](https://youtu.be/${id}) to the queue.`, 16711680)
 				if(yt[vc.id].queue.length == 1) {
 					playQueue(vc, id, skip, result.items[0].snippet.title);
@@ -127,7 +127,7 @@ function youtube(msg) {
 									vc = msg.member.voiceChannel;
 									if(yt[vc.id] == undefined) { yt[vc.id] = {vc: vc, queue: [], dispatcher: null}; }
 
-									yt[vc.id].queue.push({id: results[index].id.videoId, skip: "0s", name: results[index].snippet.title})
+									yt[vc.id].queue.push({id: results[index].id.videoId, skip: "0s", name: results[index].snippet.title, requestedBy: msg.member.id})
 									THOT.reply(msg, 'Music Queue', `Added [**${results[index].snippet.title}**](https://youtu.be/${results[index].id.videoId}) to the queue.`, 16711680)
 									
 									if(yt[vc.id].queue.length == 1) {
@@ -182,6 +182,8 @@ function playQueue(vc, id, skip = "0s", name) {
 		.catch(THOT.error);
 	} catch(e) {
 		THOT.error(e);
+		let msg = {channel: THOT.client.channels.get(THOT.config.home)};
+		THOT.reply(msg, 'Music Queue', `Hmm, looks like [**${name}**](https://youtu.be/${id}) is not a valid video. It has been skipped.`, 16711680);
 		yt[vc.id].queue.shift();
 		if(yt[vc.id].queue.length == 0) {
 			yt[vc.id].vc.leave();
@@ -204,15 +206,17 @@ function begone(msg) {
 function skip(msg) {
 	let vc = msg.member.voiceChannel;
 	if(vc == undefined) {return;}
-	if(!THOT.isDaddy(msg.author)) {
+
+	if(yt[vc.id].queue[0].requestedBy == msg.member.id || THOT.isDaddy(msg.author)) {
+		if(yt[vc.id].queue.length > 0) {
+			THOT.reply(msg, 'Music Queue', `Skipped [**${yt[vc.id].queue[0].name}**](https://youtu.be/${yt[vc.id].queue[0].id})`)
+			if(yt[vc.id].dispatcher) {
+				yt[vc.id].dispatcher.end();
+			}
+		}
+	} else {
 		THOT.notMyDaddy(msg);
 		return;
-	}
-	if(yt[vc.id].queue.length > 0) {
-		THOT.reply(msg, 'Music Queue', `Skipped **${yt[vc.id].queue[0].name}**`)
-		if(yt[vc.id].dispatcher) {
-			yt[vc.id].dispatcher.end();
-		}
 	}
 }
 
