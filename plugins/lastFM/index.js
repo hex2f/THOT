@@ -19,7 +19,7 @@ function currentPlaying (msg) {
       if (err) { throw err }
       let data = JSON.parse(body).recenttracks
       if (data == null) { THOT.reply(msg, 'LastFM', 'Invalid username. Set it using !fmset <Username>', 12189696); return }
-      let str = `**${data.track[0].artist['#text']} - ${data.track[0].name}**\n${data.track[1].artist['#text']} - ${data.track[1].name}`
+      let str = `**Current: ${data.track[0].artist['#text']} - ${data.track[0].name}**\nPrevious: ${data.track[1].artist['#text']} - ${data.track[1].name}`
       THOT.reply(msg, `${user}'s LastFM`, str, 12189696)
     })
   } catch (error) {
