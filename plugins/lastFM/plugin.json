@@ -1,5 +1,9 @@
 {
 	"name": "LastFM",
 	"version": "v1.0",
-	"entry": "index.js"
+  "entry": "index.js",
+  "commands": [
+    { "command": "!fm", "usage": "" },
+    { "command": "!fmset", "usage": "<LastFM Username>" }
+  ]
 }

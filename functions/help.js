@@ -12,10 +12,17 @@ module.exports = function (msg, plugins, cb) {
     }
   } else {
     let plugin = plugins.find(p => p.name.toLowerCase() === arg.toLowerCase())
-    str = `**${plugin.name}'s commands:**\n`
-    plugin.commands.forEach(command => {
-      str += `**${command.command}** ${command.usage}\n`
-    })
+    if (plugin === undefined) {
+      str = `Usage: !help <plugin>\n\n**Installed Plugins**\n`
+      plugins.forEach(plugin => {
+        str += `**${plugin.name}** ${plugin.version}\n`
+      })
+    } else {
+      str = `**${plugin.name}'s commands:**\n`
+      plugin.commands.forEach(command => {
+        str += `**${command.command}** ${command.usage}\n`
+      })
+    }
   }
 
   cb(msg, 'Available Commands', str)
