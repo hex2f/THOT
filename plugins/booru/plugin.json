@@ -1,0 +1,8 @@
+{
+	"name": "Booru",
+	"version": "v1.0",
+  "entry": "index.js",
+  "commands": [
+    { "command": "!jpeg", "usage": "<Image URL> <Quality 1-100>" }
+  ]
+}

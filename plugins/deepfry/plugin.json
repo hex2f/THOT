@@ -3,6 +3,12 @@
 	"version": "v1.0",
   "entry": "index.js",
   "commands": [
-    { "command": "!jpeg", "usage": "<Image URL> <Quality 1-100>" }
+    { "command": "!jpeg", "usage": "<Image URL> <Quality 1-100>" },
+    { "command": "!scale", "usage": "<Image URL> <Factor>" },
+    { "command": "!pixelate", "usage": "<Image URL> <Size>" },
+    { "command": "!brightness", "usage": "<Image URL> <Number between -1 and +1>" },
+    { "command": "!contrast", "usage": "<Image URL> <Number between -1 and +1>" },
+    { "command": "!invert", "usage": "<Image URL>" },
+    { "command": "!fry", "usage": "<Image URL> <Strength>" }
   ]
 }
