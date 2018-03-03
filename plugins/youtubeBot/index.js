@@ -1,5 +1,4 @@
 let THOT
-let streamOptions = { passes: 4, bitrate: 28000 }
 
 const THOTUtils = require('../../THOTUtils')
 const YouTube = require('youtube-node')
@@ -153,16 +152,17 @@ function playQueue (vc, id, skip = '0s', name) {
   try {
     let msg = {channel: THOT.client.channels.get(THOT.config.home)}
     THOT.reply(msg, 'Music Queue', `Playing [**${name}**](https://youtu.be/${id})`, 16711680)
-    let stream
-    if (skip !== '0s') {
-      stream = ytdl(`https://www.youtube.com/watch?v=${id}`, { begin: skip })
-    } else {
-      stream = ytdl(`https://www.youtube.com/watch?v=${id}`, { filter: 'audioonly' })
-    }
     yt[vc.id].vc.join()
     .then(connection => { // Connection is an instance of VoiceConnection
-      yt[vc.id].dispatcher = connection.playStream(stream, streamOptions)
-      yt[vc.id].dispatcher.on('end', () => {
+      let stream
+      console.log(`https://www.youtube.com/watch?v=${id}`)
+      if (skip !== '0s') {
+        stream = ytdl(`https://www.youtube.com/watch?v=${id}`, { begin: skip })
+      } else {
+        stream = ytdl(`https://www.youtube.com/watch?v=${id}`, { filter: 'audioonly' })
+      }
+      const dispatcher = connection.playStream(stream)
+      dispatcher.on('end', () => {
         yt[vc.id].queue.shift()
         if (yt[vc.id].queue.length === 0) {
           yt[vc.id].vc.leave()
@@ -189,14 +189,6 @@ function playQueue (vc, id, skip = '0s', name) {
   }
 }
 
-function begone (msg) {
-  if (msg.member.voiceChannel) {
-    msg.member.voiceChannel.leave()
-  } else {
-    THOT.reply(msg, 'OwO', 'but DADDY OwO')
-  }
-}
-
 function skip (msg) {
   let vc = msg.member.voiceChannel
   if (vc === undefined) { return }
@@ -216,11 +208,12 @@ function skip (msg) {
 function clear (msg) {
   let vc = msg.member.voiceChannel
   if (vc === undefined) { return }
+
   if (!THOT.isDaddy(msg.author)) {
     THOT.notMyDaddy(msg)
     return
   }
-  if (yt[vc.id].queue.length > 0) {
+  if (yt[vc.id] && yt[vc.id].queue.length > 0) {
     yt[vc.id].queue = []
     if (yt[vc.id].dispatcher) {
       yt[vc.id].dispatcher.end()
@@ -233,7 +226,6 @@ function developerOptions (msg) {
   let args = THOTUtils.parseParams(msg.content, [0, 0])
   if (args.err) { THOT.reply(msg, 'Usage Error', 'Usage: !options <passes> <bitrate>') }
   if (THOT.isDaddy(msg.author)) {
-    streamOptions = { passes: args[0], bitrate: args[1] }
     msg.react('✅')
   } else {
     THOT.notMyDaddy(msg)
@@ -263,7 +255,7 @@ function init (thot) {
   THOT.on('!queue', sendQueue)
   THOT.on('!clear', clear)
   THOT.on('!skip', skip)
-  THOT.on('begone', begone)
+  THOT.on('begone', clear)
 }
 
 module.exports = {
