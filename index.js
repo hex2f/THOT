@@ -1,3 +1,4 @@
+const colors = require('colors')
 const ora = require('ora')
 const lookingSpinner = ora('Searching for plugins...').start()
 
@@ -51,13 +52,7 @@ class THOTBot extends EventEmitter {
 
   init () {
     this.on('!setdaddy', (msg) => {
-      if (!this.isDaddy(msg.author)) { this.notMyDaddy(msg); return }
-      let args = THOTUtils.parseParams(msg.content, ['', ''])
-      if (args.err) { msg.channel.send('Usage: !setdaddy <true || false> <usertag>'); msg.react('🇽'); return }
-      config.daddy[args[1]] = args[0]
-      this.config = config
-      fs.writeFile('./config.json', JSON.stringify(config))
-      msg.react('✅')
+      require('./functions/plugins.js')(msg, config, this)
     })
     this.on('!set', (msg) => {
       if (!this.isDaddy(msg.author)) { this.notMyDaddy(msg); return }
@@ -69,37 +64,10 @@ class THOTBot extends EventEmitter {
       msg.react('✅')
     })
     this.on('!plugins', (msg) => {
-      let str = ``
-      plugins.forEach(plugin => {
-        str += `**${plugin.name}** ${plugin.version}\n`
-      })
-      if (str.length === 0) {
-        str = 'No plugins installed.'
-      }
-
-      this.reply(msg, 'Installed Plugins', str)
+      require('./functions/plugins.js')(msg, plugins, this.reply)
     })
     this.on('!help', (msg) => {
-      let str = ``
-      const arg = msg.content.split(' ')[1]
-
-      if (arg === undefined) {
-        str = `Usage: !help <plugin>\n\n**Installed Plugins**\n`
-        plugins.forEach(plugin => {
-          str += `**${plugin.name}** ${plugin.version}\n`
-        })
-        if (str.length === 0) {
-          str = 'No plugins installed.'
-        }
-      } else {
-        let plugin = plugins.find(p => p.name.toLowerCase() === arg.toLowerCase())
-        str = `**${plugin.name}'s commands:**\n`
-        plugin.commands.forEach(command => {
-          str += `**${command.command}** ${command.usage}\n`
-        })
-      }
-
-      this.reply(msg, 'Available Commands', str)
+      require('./functions/help.js')(msg, plugins, this.reply)
     })
     this.on('!reload', (msg) => {
       if (!this.isDaddy(msg.author)) {
