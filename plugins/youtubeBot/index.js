@@ -1,4 +1,5 @@
 let THOT
+let streamOptions = { passes: 4, bitrate: 28000 }
 
 const THOTUtils = require('../../THOTUtils')
 const YouTube = require('youtube-node')
@@ -155,14 +156,13 @@ function playQueue (vc, id, skip = '0s', name) {
     yt[vc.id].vc.join()
     .then(connection => { // Connection is an instance of VoiceConnection
       let stream
-      console.log(`https://www.youtube.com/watch?v=${id}`)
       if (skip !== '0s') {
         stream = ytdl(`https://www.youtube.com/watch?v=${id}`, { begin: skip })
       } else {
         stream = ytdl(`https://www.youtube.com/watch?v=${id}`, { filter: 'audioonly' })
       }
-      const dispatcher = connection.playStream(stream)
-      dispatcher.on('end', () => {
+      yt[vc.id].dispatcher = connection.playStream(stream, streamOptions)
+      yt[vc.id].dispatcher.on('end', () => {
         yt[vc.id].queue.shift()
         if (yt[vc.id].queue.length === 0) {
           yt[vc.id].vc.leave()
@@ -226,6 +226,7 @@ function developerOptions (msg) {
   let args = THOTUtils.parseParams(msg.content, [0, 0])
   if (args.err) { THOT.reply(msg, 'Usage Error', 'Usage: !options <passes> <bitrate>') }
   if (THOT.isDaddy(msg.author)) {
+    streamOptions = { passes: args[0], bitrate: args[1] }
     msg.react('✅')
   } else {
     THOT.notMyDaddy(msg)

@@ -48,6 +48,7 @@ class THOTBot extends EventEmitter {
     const embed = new Discord.RichEmbed(data)
     msg.channel.send(embed)
   }
+
   init () {
     this.on('!setdaddy', (msg) => {
       if (!this.isDaddy(msg.author)) { this.notMyDaddy(msg); return }
