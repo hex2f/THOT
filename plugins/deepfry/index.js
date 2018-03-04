@@ -59,13 +59,9 @@ function track (msg) {
         Jimp.read(`${__dirname}/flare.png`, function (err, flare) {
           flare.scaleToFit(image.bitmap.width, image.bitmap.height)
 
-          msg.channel.send(JSON.stringify(event.data))
           event.data.forEach(eye => {
-            console.log(eye)
             image.composite(flare, eye.x + (eye.width / 2) - (flare.bitmap.width / 2), eye.y + (eye.height / 2) - (flare.bitmap.height / 2))
           })
-
-          console.log('send')
 
           image.getBuffer(mime, (err, buffer) => {
             if (err) { THOT.error(err); return }

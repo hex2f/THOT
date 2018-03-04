@@ -9,6 +9,7 @@
     { "command": "!brightness", "usage": "<Image URL> <Number between -1 and +1>" },
     { "command": "!contrast", "usage": "<Image URL> <Number between -1 and +1>" },
     { "command": "!invert", "usage": "<Image URL>" },
-    { "command": "!fry", "usage": "<Image URL> <Strength>" }
+    { "command": "!fry", "usage": "<Image URL> <Strength>" },
+    { "command": "!eyes", "usage": "<Image URL>" }
   ]
 }
