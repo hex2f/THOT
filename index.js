@@ -91,7 +91,11 @@ class THOTBot extends EventEmitter {
 const thot = new THOTBot()
 
 const Discord = require('discord.js')
-const client = new Discord.Client()
+
+class BetterClient extends Discord.Client {
+  get browser () { return false }
+}
+const client = new BetterClient()
 
 client.on('ready', () => {
   connectingSpinner.succeed(`Connected to Discord as ${client.user.tag}.`)

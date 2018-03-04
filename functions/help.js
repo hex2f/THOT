@@ -1,5 +1,6 @@
 module.exports = function (msg, plugins, cb) {
   let str = ``
+  let title = 'Available Commands'
   const arg = msg.content.split(' ')[1]
 
   if (arg === undefined) {
@@ -18,12 +19,12 @@ module.exports = function (msg, plugins, cb) {
         str += `**${plugin.name}** ${plugin.version}\n`
       })
     } else {
-      str = `**${plugin.name}'s commands:**\n`
+      title = `${plugin.name}'s commands:`
       plugin.commands.forEach(command => {
         str += `**${command.command}** ${command.usage}\n`
       })
     }
   }
 
-  cb(msg, 'Available Commands', str)
+  cb(msg, title, str)
 }
