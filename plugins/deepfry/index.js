@@ -4,6 +4,9 @@ const THOTUtils = require('../../THOTUtils/index.js')
 const Jimp = require('jimp')
 const imgurUploader = require('imgur-uploader')
 
+const getPixels = require('get-pixels')
+const tracking = require('jstracking')
+
 let prevImages = {}
 
 const actions = {
@@ -14,6 +17,72 @@ const actions = {
   contrast: { parse: ['', 0], usage: '<Image URL> <Number between -1 and +1>' },
   invert: { parse: [''], usage: '<Image URL>' },
   fry: { parse: ['', 0], usage: '<Image URL> <Amount of Oil 1-100>' }
+}
+
+function track (msg) {
+  setTimeout(() => {
+    let args = THOTUtils.parseParams(msg.content, [''])
+
+    if (args.err) {
+      msg.react('🇽'); msg.channel.send(`Usage: **!eyes <Image URL>**`); return
+    }
+
+    if (msg.embeds[0] && !msg.embeds[0].thumbnail.url) {
+      msg.react('🇽'); msg.channel.send('Sorry but i could not find that image.'); return
+    }
+
+    if (args[0] === '.') {
+      if (prevImages[msg.author.id]) {
+        msg.embeds[0] = {}
+        msg.embeds[0].thumbnail = {}
+        msg.embeds[0].thumbnail.url = prevImages[msg.author.id]
+      } else {
+        msg.react('🇽'); msg.channel.send('Sorry but i could not find your previous image.'); return
+      }
+    } else if (!msg.embeds[0]) {
+      msg.react('🇽'); msg.channel.send('You didn\'t seem to attach an image 🤔'); return
+    }
+    msg.react('⌛')
+
+    Jimp.read(msg.embeds[0].thumbnail.url, function (err, image) {
+      if (err) { msg.react('🇽'); msg.channel.send('Error: ' + err); return }
+
+      console.log(image.bitmap)
+
+      let mime = Jimp.AUTO
+
+      image.scaleToFit(512, 512)
+
+      const tracker = new tracking.ObjectTracker('eye')
+
+      tracker.on('track', event => {
+        Jimp.read(`${__dirname}/flare.png`, function (err, flare) {
+          flare.scaleToFit(image.bitmap.width, image.bitmap.height)
+
+          msg.channel.send(JSON.stringify(event.data))
+          event.data.forEach(eye => {
+            console.log(eye)
+            image.composite(flare, eye.x + (eye.width / 2) - (flare.bitmap.width / 2), eye.y + (eye.height / 2) - (flare.bitmap.height / 2))
+          })
+
+          console.log('send')
+
+          image.getBuffer(mime, (err, buffer) => {
+            if (err) { THOT.error(err); return }
+            imgurUploader(buffer, {title: `THOT - EYES by ${msg.author.username}`}).then(data => {
+              msg.react('✅')
+              setTimeout(() => {
+                prevImages[msg.author.id] = data.link
+                msg.channel.send(data.link)
+              }, 150)
+            })
+          })
+        })
+      })
+
+      tracker.track(image.bitmap.data, image.bitmap.width, image.bitmap.height)
+    })
+  }, 500)
 }
 
 function image (action, msg) {
@@ -48,11 +117,13 @@ function image (action, msg) {
         if (err) { msg.react('🇽'); msg.channel.send('Error: ' + err); return }
 
         Jimp.read(msg.embeds[0].thumbnail.url, function (err, image) {
+          let mime = Jimp.AUTO
           if (err) { msg.react('🇽'); msg.channel.send('Error: ' + err); return }
 
           switch (action) {
             case 'jpeg':
               image.quality(args[1])
+              mime = Jimp.MIME_JPEG
               break
             case 'scale':
               image.scale(args[1])
@@ -76,6 +147,8 @@ function image (action, msg) {
               cryemoji.rotate(Math.floor(Math.random() * 90) - 45)
               cryemoji.resize(Jimp.AUTO, (Math.floor(Math.random() * image.bitmap.width / 2) + 50) * (args[1] / 100))
 
+              mime = Jimp.MIME_JPEG
+
               image.composite(bemoji,
                 Math.floor(Math.random() * (image.bitmap.width - image.bitmap.width / 4)) + image.bitmap.width / 4 - bemoji.bitmap.width,
                 Math.floor(Math.random() * (image.bitmap.height - image.bitmap.height / 4)) + image.bitmap.height / 4 - bemoji.bitmap.height)
@@ -95,9 +168,9 @@ function image (action, msg) {
               break
           }
 
-          image.getBuffer(Jimp.AUTO, (err, buffer) => {
+          image.getBuffer(mime, (err, buffer) => {
             if (err) { THOT.error(err); return }
-            imgurUploader(buffer, {title: `THOT - JPEG by ${msg.author.username}`}).then(data => {
+            imgurUploader(buffer, {title: `THOT - ${action} by ${msg.author.username}`}).then(data => {
               msg.react('✅')
               setTimeout(() => {
                 prevImages[msg.author.id] = data.link
@@ -120,6 +193,8 @@ function init (thot) {
   THOT.on('!contrast', msg => image('contrast', msg))
   THOT.on('!invert', msg => image('invert', msg))
   THOT.on('!fry', msg => image('fry', msg))
+
+  THOT.on('!eyes', msg => track(msg))
 }
 
 module.exports = {
