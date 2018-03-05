@@ -4,7 +4,6 @@ const THOTUtils = require('../../THOTUtils/index.js')
 const Jimp = require('jimp')
 const imgurUploader = require('imgur-uploader')
 
-const getPixels = require('get-pixels')
 const tracking = require('jstracking')
 
 let prevImages = {}

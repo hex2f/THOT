@@ -120,6 +120,7 @@ client.on('ready', () => {
 client.on('message', msg => {
   if (msg.author === client.user) { return }
   thot.emit(msg.content.split(' ')[0], msg)
+  thot.emit(`THOTFunction_message`, msg)
 })
 
 client.on('guildMemberAdd', member => {
