@@ -283,6 +283,7 @@ function image (action, msg) {
             { apply: 'saturate', params: [100] }
           ])
           image.quality(1)
+          mime = Jimp.MIME_JPEG
           break
         default:
           break
