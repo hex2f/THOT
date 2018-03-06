@@ -193,7 +193,7 @@ function skip (msg) {
   let vc = msg.member.voiceChannel
   if (vc === undefined) { return }
 
-  if (yt[vc.id].queue[0].requestedBy === msg.member.id || THOT.isDaddy(msg.author)) {
+  if (yt[vc.id].queue[0].requestedBy === msg.member.id || THOT.isDaddy(msg)) {
     if (yt[vc.id].queue.length > 0) {
       THOT.reply(msg, 'Music Queue', `Skipped [**${yt[vc.id].queue[0].name}**](https://youtu.be/${yt[vc.id].queue[0].id})`)
       if (yt[vc.id].dispatcher) {
@@ -209,7 +209,7 @@ function clear (msg) {
   let vc = msg.member.voiceChannel
   if (vc === undefined) { return }
 
-  if (!THOT.isDaddy(msg.author)) {
+  if (!THOT.isDaddy(msg)) {
     THOT.notMyDaddy(msg)
     return
   }
@@ -225,7 +225,7 @@ function clear (msg) {
 function developerOptions (msg) {
   let args = THOTUtils.parseParams(msg.content, [0, 0])
   if (args.err) { THOT.reply(msg, 'Usage Error', 'Usage: !options <passes> <bitrate>') }
-  if (THOT.isDaddy(msg.author)) {
+  if (THOT.isDaddy(msg)) {
     streamOptions = { passes: args[0], bitrate: args[1] }
     msg.react('✅')
   } else {

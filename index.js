@@ -15,8 +15,8 @@ const EventEmitter = require('events')
 const THOTUtils = require('./THOTUtils')
 
 class THOTBot extends EventEmitter {
-  isDaddy (user) {
-    if (config.daddy[`${user.username}#${user.discriminator}`] === 'true') { return true } else { return false }
+  isDaddy (msg) {
+    if (config.servers[msg.guild.id].daddy[`${msg.author.username}#${msg.author.discriminator}`] === 'true') { return true } else { return false }
   }
   log (msg) {
     var time = new Date()
@@ -49,19 +49,26 @@ class THOTBot extends EventEmitter {
     const embed = new Discord.RichEmbed(data)
     msg.channel.send(embed)
   }
+  setUserData (uid, key, value) {
+    config.userdata[uid][key] = value
+    this.config = config
+    fs.writeFile('./config.json', JSON.stringify(config, null, 2), () => {})
+  }
+  getUserData (uid, key) {
+    return this.config.userdata[uid][key]
+  }
+  setServerData (sid, key, value) {
+    config.servers[sid][key] = value
+    this.config = config
+    fs.writeFile('./config.json', JSON.stringify(config, null, 2), () => {})
+  }
+  getServerData (sid, key) {
+    return this.config.servers[sid][key]
+  }
 
   init () {
-    this.on('!setdaddy', (msg) => {
-      require('./functions/plugins.js')(msg, config, this)
-    })
-    this.on('!set', (msg) => {
-      if (!this.isDaddy(msg.author)) { this.notMyDaddy(msg); return }
-      let args = THOTUtils.parseParams(msg.content, ['', ''])
-      if (args.err) { msg.channel.send('Usage: !set <variable> <value>'); msg.react('🇽'); return }
-      config[args[0]] = args[1]
-      this.config = config
-      fs.writeFile('./config.json', JSON.stringify(config))
-      msg.react('✅')
+    this.on('!setDaddy', (msg) => {
+      require('./functions/setdaddy.js')(msg, config, this)
     })
     this.on('!plugins', (msg) => {
       require('./functions/plugins.js')(msg, plugins, this.reply)
@@ -70,7 +77,7 @@ class THOTBot extends EventEmitter {
       require('./functions/help.js')(msg, plugins, this.reply)
     })
     this.on('!reload', (msg) => {
-      if (!this.isDaddy(msg.author)) {
+      if (!this.isDaddy(msg)) {
         this.notMyDaddy(msg)
         return
       }
@@ -80,7 +87,8 @@ class THOTBot extends EventEmitter {
       }, 250)
     })
     this.on('THOTFunction_guildMemberAdd', (member) => {
-      let role = this.client.guilds.get(this.config.guildID).roles.find('name', this.config.defaultRole)
+      console.log(member)
+      let role = this.client.guilds.get(member.guild.id).roles.find('name', this.config.servers[member.guild.id].defaultRole)
       if (role !== undefined) {
         member.addRole(role).catch(this.error)
       }

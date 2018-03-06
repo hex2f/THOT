@@ -1,1 +1,21 @@
-{"clientID":"387324818850316291","prefix":"!","daddy":{"meme#0001":"true","linstr13#3709":"true","Brandbil#7160":"true"},"home":"399657834247356416","defaultRole":"Normies","guildID":"387154088854421505"}
+{
+  "clientID": "387324818850316291",
+  "prefix": "!",
+  "servers": {
+    "387154088854421505": {
+      "daddy": {
+        "meme#0001": "true",
+        "linstr13#3709": "true",
+        "Brandbil#7160": "true",
+        "Bob#8128": "true"
+      },
+      "triggers": {
+        "owo": "https://cdn.discordapp.com/attachments/397893394761777163/420301330452709387/1kHYfff.jpg",
+        "liv": "https://cdn.discordapp.com/attachments/387154088854421507/420314569747988480/unknown.png",
+        "my name": "jeff"
+      },
+      "home": "399657834247356416",
+      "defaultRole": "Normies"
+    }
+  }
+}

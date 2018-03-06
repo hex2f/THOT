@@ -1,0 +1,8 @@
+{
+	"name": "QuickPoll",
+	"version": "v1.0",
+  "entry": "index.js",
+  "commands": [
+    { "command": "!qp", "usage": "<Poll>" }
+  ]
+}
