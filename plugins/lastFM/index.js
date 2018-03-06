@@ -6,7 +6,7 @@ let THOT
 function fmset (msg) {
   let args = THOTUtils.parseParams(msg.content, [''])
   if (args.err) { THOT.reply(msg, 'LastFM', 'Usage: !fmset <Username>', 12189696); return }
-  THOT.setUserData('lastfm_username', args[0])
+  THOT.setUserData(msg.author.id, 'lastfm_username', args[0])
   msg.react('✅')
 }
 

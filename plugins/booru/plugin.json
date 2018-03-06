@@ -3,6 +3,7 @@
 	"version": "v1.0",
   "entry": "index.js",
   "commands": [
-    { "command": "!jpeg", "usage": "<Image URL> <Quality 1-100>" }
+    { "command": "!r34", "usage": "<Tags>" },
+    { "command": "!hentaibomb", "usage": "<Tags>" }
   ]
 }

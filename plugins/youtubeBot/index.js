@@ -151,7 +151,7 @@ function youtube (msg) {
 
 function playQueue (vc, id, skip = '0s', name) {
   try {
-    let msg = {channel: THOT.client.channels.get(THOT.config.home)}
+    let msg = {channel: THOT.client.channels.get(THOT.config.servers[vc.guild.id].home)}
     THOT.reply(msg, 'Music Queue', `Playing [**${name}**](https://youtu.be/${id})`, 16711680)
     yt[vc.id].vc.join()
     .then(connection => { // Connection is an instance of VoiceConnection

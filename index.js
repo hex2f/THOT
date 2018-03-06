@@ -50,6 +50,7 @@ class THOTBot extends EventEmitter {
     msg.channel.send(embed)
   }
   setUserData (uid, key, value) {
+    if (config.userdata[uid] === undefined) { config.userdata[uid] = {} }
     config.userdata[uid][key] = value
     this.config = config
     fs.writeFile('./config.json', JSON.stringify(config, null, 2), () => {})
@@ -86,12 +87,64 @@ class THOTBot extends EventEmitter {
         process.exit()
       }, 250)
     })
+    this.on('!setHome', (msg) => {
+      if (!this.isDaddy(msg)) {
+        this.notMyDaddy(msg)
+        return
+      }
+      config.servers[msg.guild.id].home = msg.channel.id
+      msg.react('✅')
+
+      this.config = config
+      fs.writeFile('./config.json', JSON.stringify(config, null, 2), () => {})
+    })
+    this.on('!setDefaultRole', (msg) => {
+      if (!this.isDaddy(msg)) {
+        this.notMyDaddy(msg)
+        return
+      }
+      if (msg.content.split(' ')[1] === undefined) {
+        msg.channel.send('Usage: !setDefaultRole <Role Name>')
+        return
+      }
+      if (this.client.guilds.get(msg.guild.id).roles.find('name', msg.content.split(' ')[1]) === null) {
+        msg.channel.send(`Sorry but i couldn't find ${msg.content.split(' ')[1]}`)
+        return
+      }
+
+      config.servers[msg.guild.id].defaultRole = msg.content.split(' ')[1]
+      msg.react('✅')
+
+      this.config = config
+      fs.writeFile('./config.json', JSON.stringify(config, null, 2), () => {})
+    })
     this.on('THOTFunction_guildMemberAdd', (member) => {
       console.log(member)
       let role = this.client.guilds.get(member.guild.id).roles.find('name', this.config.servers[member.guild.id].defaultRole)
       if (role !== undefined) {
         member.addRole(role).catch(this.error)
       }
+    })
+    this.on('THOTFunction_guildCreate', (server) => {
+      console.log(server)
+
+      const defaultChannel = THOTUtils.getDefaultChannel(server)
+
+      let cserver = {
+        daddy: {},
+        triggers: {},
+        home: defaultChannel.id,
+        defaultRole: null
+      }
+
+      cserver.daddy[`${server.owner.user.username}#${server.owner.user.discriminator}`] = 'true'
+
+      config.servers[server.id] = cserver
+
+      this.config = config
+      fs.writeFile('./config.json', JSON.stringify(config, null, 2), () => {})
+
+      defaultChannel.send('Hi there! My name is THOT and i enjoy **pleasing daddy** :weary:\nUse `!setHome` to select which channel i should spam my messages in.\nYou can also use `!help` to get a list of my commands.')
     })
   }
 }
@@ -137,6 +190,10 @@ client.on('guildMemberAdd', member => {
 
 client.on('messageReactionAdd', (reaction, user) => {
   thot.emit(`THOTFunction_messageReactionAdd`, {reaction, user})
+})
+
+client.on('guildCreate', server => {
+  thot.emit('THOTFunction_guildCreate', server)
 })
 
 const connectingSpinner = ora('Connecting to Discord...').start()

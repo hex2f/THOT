@@ -1,21 +1,43 @@
 {
   "clientID": "387324818850316291",
   "prefix": "!",
+  "userdata": {
+    "215143736114544640": {
+      "lastfm_username": "dacexi"
+    },
+    "152074752608043008": {
+      "lastfm_username": "kallejoki"
+    }
+  },
   "servers": {
     "387154088854421505": {
       "daddy": {
-        "meme#0001": "true",
-        "linstr13#3709": "true",
-        "Brandbil#7160": "true",
-        "Bob#8128": "true"
+        "meme#0001": "true"
       },
       "triggers": {
-        "owo": "https://cdn.discordapp.com/attachments/397893394761777163/420301330452709387/1kHYfff.jpg",
-        "liv": "https://cdn.discordapp.com/attachments/387154088854421507/420314569747988480/unknown.png",
-        "my name": "jeff"
+        "owo": "https://cdn.discordapp.com/attachments/397893394761777163/420301330452709387/1kHYfff.jpg"
       },
       "home": "399657834247356416",
-      "defaultRole": "Normies"
+      "defaultRole": null
+    },
+    "420643682778218496": {
+      "daddy": {
+        "meme#0001": "true"
+      },
+      "triggers": {},
+      "home": "420658014656135168",
+      "defaultRole": null
+    },
+    "415820690587910154": {
+      "daddy": {
+        "Geraldo#7375": "true",
+        "meme#0001": "true"
+      },
+      "triggers": {
+        "owo": "https://cdn.discordapp.com/attachments/397893394761777163/420301330452709387/1kHYfff.jpg"
+      },
+      "home": "420654541839663125",
+      "defaultRole": null
     }
   }
 }
