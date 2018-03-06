@@ -22,7 +22,6 @@ function derivative (msg) {
     let arg1 = args.split(';')[0]
     let arg2 = args.split(';')[1]
 
-    console.log(args, arg1, arg2)
     if (arg1 !== undefined) {
       let m = math.derivative(arg1, arg2).toString()
       THOT.reply(msg, 'Math', m, 431075)

@@ -3,6 +3,7 @@ const ora = require('ora')
 const lookingSpinner = ora('Searching for plugins...').start()
 
 const config = require('./config.json')
+const events = require('./events.json')
 const token = require('../botToken.json')
 let plugins = require('./plugins.js').find((pl) => {
   lookingSpinner.stopAndPersist({ symbol: '✔', text: `Found ${pl.name} ${pl.version}` })
@@ -101,8 +102,10 @@ client.on('message', msg => {
   thot.emit(msg.content.split(' ')[0], msg)
 })
 
-client.on('*', (e1, e2) => {
-  thot.emit(`THOTFunction_${this.event}`, e1, e2)
+events.forEach(event => {
+  client.on(event, (e1, e2) => {
+    thot.emit(`THOTFunction_${event}`, e1, e2)
+  })
 })
 
 const connectingSpinner = ora('Connecting to Discord...').start()

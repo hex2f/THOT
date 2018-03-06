@@ -3,6 +3,7 @@
 	"version": "v1.0",
   "entry": "index.js",
   "commands": [
-    { "command": "!math", "usage": "<Expression>" }
+    { "command": "!math", "usage": "<Expression>" },
+    { "command": "!derivative", "usage": "<x^2>;<x>" }
   ]
 }
