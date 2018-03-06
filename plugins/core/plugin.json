@@ -1,0 +1,12 @@
+{
+	"name": "THOTCore",
+	"version": "v1.0",
+  "entry": "index.js",
+  "commands": [
+    { "command": "!setDaddy", "usage": "<User#0001> <true|false>" },
+    { "command": "!plugins", "usage": "" },
+    { "command": "!help", "usage": "<Plugin>" },
+    { "command": "!setHome", "usage": "" },
+    { "command": "!setDefaultRole", "usage": "<Role Name>" }
+  ]
+}
