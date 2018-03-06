@@ -1,0 +1,8 @@
+{
+	"name": "Math",
+	"version": "v1.0",
+  "entry": "index.js",
+  "commands": [
+    { "command": "!math", "usage": "<Expression>" }
+  ]
+}
