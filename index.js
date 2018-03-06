@@ -99,19 +99,10 @@ client.on('ready', () => {
 client.on('message', msg => {
   if (msg.author === client.user) { return }
   thot.emit(msg.content.split(' ')[0], msg)
-  thot.emit(`THOTFunction_message`, msg)
 })
 
-client.on('guildMemberAdd', member => {
-  thot.emit(`THOTFunction_guildMemberAdd`, member)
-})
-
-client.on('messageReactionAdd', (reaction, user) => {
-  thot.emit(`THOTFunction_messageReactionAdd`, {reaction, user})
-})
-
-client.on('guildCreate', server => {
-  thot.emit('THOTFunction_guildCreate', server)
+client.on('*', (e1, e2) => {
+  thot.emit(`THOTFunction_${this.event}`, e1, e2)
 })
 
 const connectingSpinner = ora('Connecting to Discord...').start()

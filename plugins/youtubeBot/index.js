@@ -115,11 +115,12 @@ function youtube (msg) {
 
           react()
 
-          const onReact = (data) => {
-            if (data.user.id !== THOT.client.user.id) {
-              if (data.reaction.message.id === message.id && data.user.id === msg.author.id) {
-                if (emojis.indexOf(data.reaction.emoji.toString()) > -1) {
-                  const index = emojis.indexOf(data.reaction.emoji.toString())
+          const onReact = (reaction, user) => {
+            console.log(reaction, user)
+            if (user.id !== THOT.client.user.id) {
+              if (reaction.message.id === message.id && user.id === msg.author.id) {
+                if (emojis.indexOf(reaction.emoji.toString()) > -1) {
+                  const index = emojis.indexOf(reaction.emoji.toString())
 
                   if (!ytdl.validateID(results[index].id.videoId)) { msg.reply('Oops, looks like that option didn\'t have a valid ID.'); return }
 
