@@ -27,6 +27,12 @@ function setTrigger (msg) {
   if (data === undefined) { data = {} }
 
   const msgstr = msg.content
+
+  if (msgstr.split('!setTrigger ')[1] === undefined) {
+    THOT.reply(msg, 'Trigger Error', 'Usage: !setTrigger <Trigger>|<Response>')
+    return
+  }
+
   let args = msgstr.split('!setTrigger ')[1].split('|')
 
   data[args[0].toLowerCase()] = args[1]
