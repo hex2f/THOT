@@ -18,7 +18,7 @@ module.exports = function (msg, THOT) {
     tags[tag].forEach(plugin => {
       str += `**${plugin.name}** ${plugin.version}\n`
       plugin.commands.forEach(command => {
-        str += `${command.command} ${command.usage}\n`
+        str += `\`${command.command} ${command.usage}\`\n`
       })
       str += `\n`
     })

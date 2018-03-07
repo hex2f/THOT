@@ -46,6 +46,10 @@ function search (cmd, msg, c) {
 }
 
 function r34 (msg) {
+  if (msg.channel.nsfw === false) {
+    THOT.reply(msg, 'NSFW', 'This command can only be used in channels marked as NSFW.')
+    return
+  }
   search('!r34', msg, res => {
     if (res.length === 0) { return }
     console.log(res)
@@ -69,6 +73,10 @@ function r34 (msg) {
 }
 
 function bomb (msg) {
+  if (msg.channel.nsfw === false) {
+    THOT.reply(msg, 'NSFW', 'This command can only be used in channels marked as **Not Safe For Work**.')
+    return
+  }
   search('!hentaibomb', msg, res => {
     if (res.length === 0) { return }
     const image1 = res[Math.floor(Math.random() * res.length)]

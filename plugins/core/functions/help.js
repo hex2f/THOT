@@ -4,7 +4,7 @@ module.exports = function (msg, plugins, cb) {
   const arg = msg.content.split(' ')[1]
 
   if (arg === undefined) {
-    str = `Usage: !help <plugin>\n\n**Installed Plugins**\n`
+    str = `Usage: \`!help <plugin>\`\nYou can also use \`!helpall\` to get a list of all plugins\n\n**Installed Plugins**\n`
     plugins.forEach(plugin => {
       str += `**${plugin.name}** ${plugin.version}\n`
     })
@@ -14,7 +14,7 @@ module.exports = function (msg, plugins, cb) {
   } else {
     let plugin = plugins.find(p => p.name.toLowerCase() === arg.toLowerCase())
     if (plugin === undefined) {
-      str = `Usage: !help <plugin>\n\n**Installed Plugins**\n`
+      str = `Usage: !help <plugin>\nYou can also use \`!helpall\` to get a list of all plugins\n\n**Installed Plugins**\n`
       plugins.forEach(plugin => {
         str += `**${plugin.name}** ${plugin.version}\n`
       })
