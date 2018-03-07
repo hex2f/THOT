@@ -99,11 +99,26 @@ client.on('ready', () => {
 
 client.on('message', msg => {
   if (msg.author === client.user) { return }
-  thot.emit(msg.content.split(' ')[0], msg)
+
+  if (msg.content.split(' ')[0] === '!setListening') {
+    if (!thot.isDaddy(msg)) { thot.notMyDaddy(msg); return }
+    if (msg.content.split(' ')[1] === 'true' || msg.content.split(' ')[1] === 'false') {
+      thot.setServerData(msg.guild.id, 'enabled', msg.content.split(' ')[1])
+      msg.react('✅')
+    } else {
+      thot.reply(msg, 'Usage Error', 'Usage: !setListening <true>|<false>')
+      msg.react('🇽')
+    }
+  }
+
+  if (thot.getServerData(msg.guild.id, 'enabled') === 'true') {
+    thot.emit(msg.content.split(' ')[0], msg)
+  }
 })
 
 events.forEach(event => {
   client.on(event, (e1, e2) => {
+    if (e1 && e1.guild && thot.getServerData(e1.guild.id, 'enabled') === 'false') { return }
     thot.emit(`THOTFunction_${event}`, e1, e2)
   })
 })

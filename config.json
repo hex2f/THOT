@@ -18,7 +18,7 @@
       },
       "home": "399657834247356416",
       "defaultRole": null,
-      "enabled": true
+      "enabled": "true"
     },
     "420643682778218496": {
       "daddy": {
@@ -27,7 +27,7 @@
       "triggers": {},
       "home": "420658014656135168",
       "defaultRole": null,
-      "enabled": true
+      "enabled": "true"
     },
     "415820690587910154": {
       "daddy": {
@@ -39,7 +39,7 @@
       },
       "home": "420654541839663125",
       "defaultRole": null,
-      "enabled": true
+      "enabled": "true"
     }
   }
 }
