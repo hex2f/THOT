@@ -1,6 +1,7 @@
 {
 	"name": "Math",
 	"version": "v1.0",
+  "tag": "Utility",
   "entry": "index.js",
   "commands": [
     { "command": "!math", "usage": "<Expression>" },

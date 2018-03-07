@@ -15,6 +15,10 @@ function help (msg) {
   require('./functions/help.js')(msg, THOT.plugins, THOT.reply)
 }
 
+function helpall (msg) {
+  require('./functions/helpall.js')(msg, THOT)
+}
+
 function setHome (msg) {
   if (!this.isDaddy(msg)) {
     this.notMyDaddy(msg)
@@ -75,6 +79,7 @@ function init (thot) {
   THOT.on('!setDaddy', setDaddy)
   THOT.on('!plugins', plugins)
   THOT.on('!help', help)
+  THOT.on('!helpall', helpall)
   THOT.on('!setHome', setHome)
   THOT.on('!setDefaultRole', setDefaultRole)
 

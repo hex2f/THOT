@@ -15,6 +15,11 @@ function findPlugins (cb = function () {}) {
       } else {
         tempPlugin.commands = []
       }
+      if (pluginConf.tag) {
+        tempPlugin.tag = pluginConf.tag
+      } else {
+        tempPlugin.tag = 'General'
+      }
       plugins.push(tempPlugin)
       cb(pluginConf)
     }

@@ -2,6 +2,7 @@
 	"name": "Youtube",
 	"version": "v1.0",
   "entry": "index.js",
+  "tag": "Music",
   "commands": [
     { "command": "!play", "usage": "<YouTube link, Video ID or Search Term>" },
     { "command": "!yt", "usage": "<YouTube Search Term>" },

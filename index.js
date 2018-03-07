@@ -84,6 +84,7 @@ client.on('ready', () => {
   thot.config = config
   thot.plugins = plugins
   thot.client = client
+  thot.Discord = Discord
 
   const initSpinner = ora('Initializing plugins...').start()
 
@@ -110,8 +111,11 @@ client.on('message', msg => {
       msg.react('🇽')
     }
   }
-
-  if (thot.getServerData(msg.guild.id, 'enabled') === 'true') {
+  if (msg.guild) {
+    if (thot.getServerData(msg.guild.id, 'enabled') === 'true') {
+      thot.emit(msg.content.split(' ')[0], msg)
+    }
+  } else {
     thot.emit(msg.content.split(' ')[0], msg)
   }
 })
@@ -125,3 +129,7 @@ events.forEach(event => {
 
 const connectingSpinner = ora('Connecting to Discord...').start()
 client.login(token.token)
+
+process.on('uncaughtException', function (err) {
+  thot.error(err)
+})

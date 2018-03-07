@@ -1,6 +1,7 @@
 {
 	"name": "Trigger",
 	"version": "v1.0",
+  "tag": "Fun",
   "entry": "index.js",
   "commands": [
     { "command": "!addTrigger", "usage": "<Match>|<Response>" }

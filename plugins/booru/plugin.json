@@ -1,6 +1,7 @@
 {
 	"name": "Booru",
-	"version": "v1.0",
+  "version": "v1.0",
+  "tag": "NSFW",
   "entry": "index.js",
   "commands": [
     { "command": "!r34", "usage": "<Tags>" },

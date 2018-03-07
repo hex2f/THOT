@@ -3,6 +3,7 @@ let THOT
 function handle (msg) {
   if (msg.content.split(' ')[0] === '!setTrigger') { return }
   try {
+    if (msg.guild === null) { return }
     const data = THOT.getServerData(msg.guild.id, 'triggers')
 
     Object.keys(data).some(key => {

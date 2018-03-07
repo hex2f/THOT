@@ -1,6 +1,7 @@
 {
 	"name": "LastFM",
 	"version": "v1.0",
+  "tag": "Utility",
   "entry": "index.js",
   "commands": [
     { "command": "!fm", "usage": "" },

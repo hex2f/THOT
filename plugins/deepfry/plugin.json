@@ -1,6 +1,7 @@
 {
 	"name": "Deepfry",
 	"version": "v1.0",
+  "tag": "Fun",
   "entry": "index.js",
   "commands": [
     { "command": "!jpeg", "usage": "<Image URL> <Quality 1-100>" },
