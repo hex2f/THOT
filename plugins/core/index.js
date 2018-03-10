@@ -70,18 +70,18 @@ function guildCreate (server) {
 
   fs.writeFile('../../config.json', JSON.stringify(THOT.config, null, 2), () => {})
 
-  defaultChannel.send('Hi there! My name is THOT and i enjoy **pleasing daddy** :weary:\nUse `!setHome` to select which channel i should spam my messages in.\nYou can also use `!help` to get a list of my commands.')
+  defaultChannel.send('Hi there! My name is THOT and i enjoy **pleasing daddy** :weary:\nUse `!sethome` to select which channel i should spam my messages in.\nYou can also use `!help` to get a list of my commands.')
 }
 
 function init (thot) {
   THOT = thot
 
-  THOT.on('!setDaddy', setDaddy)
+  THOT.on('!setdaddy', setDaddy)
   THOT.on('!plugins', plugins)
   THOT.on('!help', help)
   THOT.on('!helpall', helpall)
-  THOT.on('!setHome', setHome)
-  THOT.on('!setDefaultRole', setDefaultRole)
+  THOT.on('!sethome', setHome)
+  THOT.on('!setdefaultrole', setDefaultRole)
 
   THOT.on('THOTFunction_guildMemberAdd', memberAdd)
   THOT.on('THOTFunction_guildCreate', guildCreate)

@@ -1,7 +1,7 @@
 let THOT
 
 function handle (msg) {
-  if (msg.content.split(' ')[0] === '!setTrigger') { return }
+  if (msg.content.split(' ')[0] === '!settrigger') { return }
   try {
     if (msg.guild === null) { return }
     const data = THOT.getServerData(msg.guild.id, 'triggers')
@@ -29,12 +29,12 @@ function setTrigger (msg) {
 
   const msgstr = msg.content
 
-  if (msgstr.split('!setTrigger ')[1] === undefined) {
-    THOT.reply(msg, 'Trigger Error', 'Usage: !setTrigger <Trigger>|<Response>')
+  if (msgstr.split('!settrigger ')[1] === undefined) {
+    THOT.reply(msg, 'Trigger Error', 'Usage: !settrigger <Trigger>|<Response>')
     return
   }
 
-  let args = msgstr.split('!setTrigger ')[1].split('|')
+  let args = msgstr.split('!settrigger ')[1].split('|')
 
   data[args[0].toLowerCase()] = args[1]
 
@@ -46,7 +46,7 @@ function setTrigger (msg) {
 function init (thot) {
   THOT = thot
   THOT.on('THOTFunction_message', handle)
-  THOT.on('!setTrigger', setTrigger)
+  THOT.on('!settrigger', setTrigger)
 }
 
 module.exports = {

@@ -1,0 +1,10 @@
+{
+	"name": "Moderation",
+	"version": "v1.0",
+  "tag": "Utility",
+  "entry": "index.js",
+  "commands": [
+    { "command": "!purge", "usage": "<Amount of Messages>" },
+    { "command": "!selectpurge", "usage": "" }
+  ]
+}

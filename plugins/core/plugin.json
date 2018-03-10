@@ -4,10 +4,10 @@
   "tag": "Utility",
   "entry": "index.js",
   "commands": [
-    { "command": "!setDaddy", "usage": "<User#0001> <true|false>" },
+    { "command": "!setdaddy", "usage": "<User#0001> <true|false>" },
     { "command": "!plugins", "usage": "" },
     { "command": "!help", "usage": "<Plugin>" },
-    { "command": "!setHome", "usage": "" },
-    { "command": "!setDefaultRole", "usage": "<Role Name>" }
+    { "command": "!sethome", "usage": "" },
+    { "command": "!setdefaultrole", "usage": "<Role Name>" }
   ]
 }

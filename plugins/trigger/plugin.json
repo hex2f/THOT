@@ -4,6 +4,6 @@
   "tag": "Fun",
   "entry": "index.js",
   "commands": [
-    { "command": "!addTrigger", "usage": "<Match>|<Response>" }
+    { "command": "!addtrigger", "usage": "<Match>|<Response>" }
   ]
 }
