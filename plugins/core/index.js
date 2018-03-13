@@ -60,15 +60,14 @@ function guildCreate (server) {
   let cserver = {
     daddy: {},
     triggers: {},
+    enabled: 'true',
     home: defaultChannel.id,
     defaultRole: null
   }
 
-  cserver.daddy[`${server.owner.user.username}#${server.owner.user.discriminator}`] = 'true'
+  cserver.daddy[server.owner.user.id] = 'true'
 
-  THOT.config.servers[server.id] = cserver
-
-  fs.writeFile('../../config.json', JSON.stringify(THOT.config, null, 2), () => {})
+  THOT.setServerData(server.id, '...', cserver)
 
   defaultChannel.send('Hi there! My name is THOT and i enjoy **pleasing daddy** :weary:\nUse `!sethome` to select which channel i should spam my messages in.\nYou can also use `!help` to get a list of my commands.')
 }

@@ -38,6 +38,13 @@ function play (msg) {
 
   if (!msg.member.voiceChannel) { msg.reply('You need to join a voice channel first!'); return }
 
+  console.log(THOT.isTurbo(msg))
+
+  if (!THOT.isTurbo(msg)) {
+    THOT.buyTurboMessage(msg)
+    return
+  }
+
   const vc = msg.member.voiceChannel
 
   if (yt[vc.id] === undefined) { yt[vc.id] = {vc: vc, queue: [], dispatcher: null} }
@@ -66,6 +73,7 @@ function play (msg) {
     search(query, msg, 2, (msg, id, name) => {
       yt[vc.id].queue.push({ id, skip, name, requestedBy: msg.member.id })
       THOT.reply(msg, 'Music Queue', `Added [**${name}**](https://youtu.be/${id}) to the queue.`, 16711680)
+      THOT.useTurbo(msg)
       if (yt[vc.id].queue.length === 1) {
         playQueue(vc, id, skip, name)
       }
@@ -77,6 +85,7 @@ function play (msg) {
       } else {
         yt[vc.id].queue.push({ id, skip, name: result.items[0].snippet.title, requestedBy: msg.member.id })
         THOT.reply(msg, 'Music Queue', `Added [**${result.items[0].snippet.title}**](https://youtu.be/${id}) to the queue.`, 16711680)
+        THOT.useTurbo(msg)
         if (yt[vc.id].queue.length === 1) {
           playQueue(vc, id, skip, result.items[0].snippet.title)
         }
@@ -123,6 +132,13 @@ function youtube (msg) {
                   const index = emojis.indexOf(reaction.emoji.toString())
 
                   if (!ytdl.validateID(results[index].id.videoId)) { msg.reply('Oops, looks like that option didn\'t have a valid ID.'); return }
+
+                  if (!THOT.isTurbo(msg)) {
+                    THOT.buyTurboMessage(msg)
+                    return
+                  }
+
+                  THOT.useTurbo(msg)
 
                   vc = msg.member.voiceChannel
                   if (yt[vc.id] === undefined) { yt[vc.id] = {vc: vc, queue: [], dispatcher: null} }
@@ -223,7 +239,7 @@ function clear (msg) {
   }
 }
 
-function developerOptions (msg) {
+/* function developerOptions (msg) {
   let args = THOTUtils.parseParams(msg.content, [0, 0])
   if (args.err) { THOT.reply(msg, 'Usage Error', 'Usage: !options <passes> <bitrate>') }
   if (THOT.isDaddy(msg)) {
@@ -232,7 +248,7 @@ function developerOptions (msg) {
   } else {
     THOT.notMyDaddy(msg)
   }
-}
+} */
 
 function sendQueue (msg) {
   let vc = msg.member.voiceChannel
@@ -253,7 +269,7 @@ function init (thot) {
   THOT.on('!play', play)
   THOT.on('!youtube', youtube)
   THOT.on('!yt', youtube)
-  THOT.on('!options', developerOptions)
+  // THOT.on('!options', developerOptions)
   THOT.on('!queue', sendQueue)
   THOT.on('!clear', clear)
   THOT.on('!skip', skip)
