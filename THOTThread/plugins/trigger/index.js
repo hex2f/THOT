@@ -1,6 +1,7 @@
 let THOT
 
-function handle (msg) {
+async function handle (msg) {
+  if (msg.author.id === THOT.client.user.id) { return }
   if (msg.content.split(' ')[0] === '!settrigger') { return }
   try {
     if (msg.guild === null) { return }
@@ -18,7 +19,7 @@ function handle (msg) {
   };
 }
 
-function setTrigger (msg) {
+async function setTrigger (msg) {
   if (!THOT.isDaddy(msg)) {
     THOT.notMyDaddy(msg)
     return

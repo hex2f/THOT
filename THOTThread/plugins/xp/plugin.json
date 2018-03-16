@@ -1,0 +1,9 @@
+{
+	"name": "XP",
+	"version": "v1.0",
+  "tag": "Fun",
+  "entry": "index.js",
+  "commands": [
+    { "command": "!xp", "usage": "<User>" }
+  ]
+}

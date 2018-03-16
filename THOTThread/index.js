@@ -125,8 +125,7 @@ client.on('ready', () => {
 
 client.on('message', msg => {
   try {
-    if (msg.author === client.user) { return }
-
+    if (msg.author.id === client.user.id) { return }
     if (msg.content.split(' ')[0] === '!setListening') {
       if (!thot.isDaddy(msg)) { thot.notMyDaddy(msg); return }
       if (msg.content.split(' ')[1] === 'true' || msg.content.split(' ')[1] === 'false') {
