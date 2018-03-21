@@ -1,63 +1,70 @@
-const colors = require('colors')
-const ora = require('ora')
-const lookingSpinner = ora('Searching for plugins...').start()
+const moment = require('moment')
 
-const config = require('./config.json')
-const events = require('./events.json')
-const token = require('../botToken.json')
-let plugins = require('./plugins.js').find((pl) => {
-  lookingSpinner.stopAndPersist({ symbol: '✔', text: `Found ${pl.name} ${pl.version}` })
+const Client = require('thotdb').Client
+const db = new Client('ws://localhost:28375', 'PASSWORD')
+
+const Discord = require('discord.js')
+class BetterClient extends Discord.Client {
+  get browser () { return false }
+}
+let client = new BetterClient()
+let thread
+
+function log (str) {
+  console.log(`\x1b[3${thread.id % 7 + 1}m`, `[THREAD_${thread.id} @ ${moment().format('hh:mm:ss:SSS')}]\x1b[0m ${str}`)
+}
+
+client.on('ready', () => {
+  thread.plugins = require('./plugins.js').find((pl) => {})
+
+  require('./plugins.js').init(thread.plugins, thread, (err, pl) => {
+    if (err) { log(`${pl.name} does not export an init function. Skipping.`); return }
+    log(`Successfully loaded ${pl.name} ${pl.version}`)
+  })
+  log(`thread is now ready`)
 })
 
-lookingSpinner.succeed('Done searching for plugins.')
-
-const fs = require('fs')
 const EventEmitter = require('events')
 
-class THOTBot extends EventEmitter {
-  isDaddy (msg) {
-    if (config.servers[msg.guild.id].daddy[msg.author.id] === 'true') { return true } else { return false }
+class THOTThread extends EventEmitter {
+  async handleMessage (data, retries) {
+    let guild = client.guilds.get(data.guildID)
+    let channel = guild.channels.get(data.channelID)
+    let message = channel.messages.get(data.messageID)
+
+    if (message === undefined) {
+      setTimeout(() => this.handleMessage(data, retries + 1), 50)
+    } else {
+      this.emit(message.content.split(' ')[0], message)
+    }
   }
-  log (msg) {
-    var time = new Date()
-    console.log(`ℹ️ [${time.getHours()}:${time.getMinutes()}:${time.getSeconds()}]`.white, msg)
+  async setUserData (sid, key, value) {
+    let dbdata = db.get('userdata', sid)
+    if (!dbdata) { dbdata = {} }
+
+    dbdata[key] = value
+    await db.set('userdata', sid, dbdata)
+    return dbdata
   }
-  warn (msg) {
-    var time = new Date()
-    console.log(`⚠ [${time.getHours()}:${time.getMinutes()}:${time.getSeconds()}]`.yellow, msg)
+  async getUserData (sid, key) {
+    let dbdata = await db.get('userdata', sid)
+    if (!dbdata) { dbdata = {} }
+
+    return dbdata[key]
   }
-  error (msg) {
-    var time = new Date()
-    console.log(`🚫 [${time.getHours()}:${time.getMinutes()}:${time.getSeconds()}]`.red, msg)
+  async setServerData (sid, key, value) {
+    let dbdata = db.get('servers', sid)
+    if (!dbdata) { dbdata = {} }
+
+    dbdata[key] = value
+    await db.set('servers', sid, dbdata)
+    return dbdata
   }
-  notMyDaddy (msg) {
-    msg.reply(`You're not my daddy :triumph: :raised_hand:`)
-    msg.react('😤')
-    msg.react('✋')
-  }
-  isTurbo (msg) {
-    if (!msg.guild) { return false }
-    let uses = this.getUserData(msg.author.id, 'turboUses')
-    if (uses === undefined) { uses = 2 }
-    return uses > 0
-  }
-  useTurbo (msg) {
-    if (!msg.guild) { return false }
-    let uses = this.getUserData(msg.author.id, 'turboUses')
-    console.log(uses)
-    if (uses === undefined) { uses = 100 }
-    this.setUserData(msg.author.id, 'turboUses', uses - 1)
-  }
-  buyTurboMessage (msg) {
-    this.richReply(msg, {
-      description: "You've used up your monthly TurboTHOT access. To unlock the full potential of THOT please [purchase TurboTHOT](https://google.com/).",
-      author: {
-        name: 'Buy TurboTHOT',
-        url: 'https://google.com/',
-        icon_url: 'https://images-na.ssl-images-amazon.com/images/I/61frS-Xn8HL.png'
-      },
-      color: 431075
-    })
+  async getServerData (sid, key) {
+    let dbdata = await db.get('servers', sid)
+    if (!dbdata) { dbdata = {} }
+
+    return dbdata[key]
   }
   reply (msg, title, description, color = 16711680, url = null, image = null) {
     const embed = new Discord.RichEmbed({
@@ -73,89 +80,24 @@ class THOTBot extends EventEmitter {
     const embed = new Discord.RichEmbed(data)
     msg.channel.send(embed)
   }
-  setUserData (uid, key, value) {
-    if (config.userdata[uid] === undefined) { config.userdata[uid] = {} }
-    config.userdata[uid][key] = value
-    this.config = config
-    fs.writeFile('./config.json', JSON.stringify(config, null, 2), () => {})
-  }
-  getUserData (uid, key) {
-    if (config.userdata[uid] === undefined) { config.userdata[uid] = {} }
-    return this.config.userdata[uid][key]
-  }
-  setServerData (sid, key, value) {
-    if (config.servers[sid] === undefined) { config.servers[sid] = {} }
-    if (key === '...') { config.servers[sid] = value } else { config.servers[sid][key] = value }
-    this.config = config
-    fs.writeFile('./config.json', JSON.stringify(config, null, 2), () => {})
-  }
-  getServerData (sid, key) {
-    return this.config.servers[sid][key]
-  }
 }
 
-const thot = new THOTBot()
-
-const Discord = require('discord.js')
-
-class BetterClient extends Discord.Client {
-  get browser () { return false }
-}
-const client = new BetterClient()
-
-client.on('ready', () => {
-  connectingSpinner.succeed(`Connected to Discord as ${client.user.tag}.`)
-
-  thot.config = config
-  thot.plugins = plugins
-  thot.client = client
-  thot.Discord = Discord
-
-  const initSpinner = ora('Initializing plugins...').start()
-
-  require('./plugins.js').init(plugins, thot, (err, pl) => {
-    if (err) { initSpinner.stopAndPersist({ symbol: '⚠', text: `${pl.name} does not export an init function. Skipping.` }); return }
-    initSpinner.stopAndPersist({ symbol: '✔', text: `Successfully loaded ${pl.name} ${pl.version}` })
-  })
-
-  initSpinner.succeed(`Ready.`)
-
-  client.user.setPresence({ game: { name: 'you.', type: 3 } })
-})
-
-client.on('message', msg => {
+process.on('message', (data) => {
   try {
-    if (msg.author.id === client.user.id) { return }
-    if (msg.content.split(' ')[0] === '!setListening') {
-      if (!thot.isDaddy(msg)) { thot.notMyDaddy(msg); return }
-      if (msg.content.split(' ')[1] === 'true' || msg.content.split(' ')[1] === 'false') {
-        thot.setServerData(msg.guild.id, 'enabled', msg.content.split(' ')[1])
-        msg.react('✅')
-      } else {
-        thot.reply(msg, 'Usage Error', 'Usage: !setListening <true>|<false>')
-        msg.react('🇽')
-      }
+    if (data.action === 'init') {
+      thread = new THOTThread()
+      thread.id = data.thread
+      thread.client = client
+
+      process.title = `THOT_THREAD_${thread.id}`
+      client.login(data.token)
+      log(`Initializing thread`)
     }
-    if (msg.guild) {
-      if (thot.getServerData(msg.guild.id, 'enabled') === 'true') {
-        thot.emit(msg.content.split(' ')[0], msg)
-      }
-    } else {
-      thot.emit(msg.content.split(' ')[0], msg)
+
+    if (data.action === 'message') {
+      thread.handleMessage(data, 0)
     }
-  } catch (e) { }
-})
+  } catch (e) {
 
-events.forEach(event => {
-  client.on(event, (e1, e2) => {
-    if (e1 && e1.guild && thot.getServerData(e1.guild.id, 'enabled') === 'false') { return }
-    thot.emit(`THOTFunction_${event}`, e1, e2)
-  })
-})
-
-const connectingSpinner = ora('Connecting to Discord...').start()
-client.login(token.token)
-
-process.on('uncaughtException', function (err) {
-  thot.error(err)
+  }
 })

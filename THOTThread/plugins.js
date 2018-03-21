@@ -3,7 +3,7 @@ const fs = require('fs')
 function findPlugins (cb = function () {}) {
   let plugins = []
 
-  fs.readdirSync('./plugins').forEach((plugin) => {
+  fs.readdirSync(__dirname + '/plugins').forEach((plugin) => {
     if (require(`./plugins/${plugin}/plugin.json`)) {
       const pluginConf = require(`./plugins/${plugin}/plugin.json`)
       if (!pluginConf.name || !pluginConf.version || !pluginConf.entry) { return }

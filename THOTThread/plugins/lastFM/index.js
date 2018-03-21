@@ -3,16 +3,16 @@ const THOTUtils = require('../../THOTUtils/index.js')
 
 let THOT
 
-function fmset (msg) {
+async function fmset (msg) {
   let args = THOTUtils.parseParams(msg.content, [''])
   if (args.err) { THOT.reply(msg, 'LastFM', 'Usage: !fmset <Username>', 12189696); return }
-  THOT.setUserData(msg.author.id, 'lastfm_username', args[0])
+  await THOT.setUserData(msg.author.id, 'lastfm_username', args[0])
   msg.react('✅')
 }
 
-function currentPlaying (msg) {
+async function currentPlaying (msg) {
   try {
-    var user = THOT.getUserData(msg.author.id, 'lastfm_username')
+    var user = await THOT.getUserData(msg.author.id, 'lastfm_username')
     request(`http://ws.audioscrobbler.com/2.0/?method=user.getrecenttracks&user=${user}&api_key=8a3f54b3b37c3a5e0adda40da34af4fb&format=json`, (err, res, body) => {
       if (err) { throw err }
       let data = JSON.parse(body).recenttracks
